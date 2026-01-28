@@ -900,6 +900,25 @@
         backdrop-filter: blur(12px);
         z-index: 5;
       }
+
+      /* WIN POP ANIMATION */
+      @keyframes winPop {
+        0% {
+          transform: scale(0.92);
+          opacity: 0;
+        }
+        60% {
+          transform: scale(1.03);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .winPop {
+        animation: winPop 280ms cubic-bezier(0.15, 0.9, 0.2, 1) both;
+      }
     </style>
   </head>
 
@@ -978,6 +997,36 @@
           <div class="closeBtn" id="closeOverlay">Close</div>
         </div>
         <div class="stage" id="stage"></div>
+      </div>
+    </div>
+
+    <!-- WIN OVERLAY -->
+    <div class="overlay" id="winOverlay" aria-hidden="true">
+      <div class="modal">
+        <div class="modalTop">
+          <div>
+            <h2 id="winTitle">You found them all! ✨</h2>
+            <div class="hint" id="winHint">
+              Your tray is full of fidgets. Ready for a new scene?
+            </div>
+          </div>
+          <div class="closeBtn" id="winContinue">Continue</div>
+        </div>
+
+        <div class="stage" id="winStage">
+          <div style="text-align: center; padding: 18px">
+            <div style="font-size: 44px; line-height: 1">🏆</div>
+            <div
+              style="
+                margin-top: 10px;
+                font-size: 13px;
+                color: rgba(32, 24, 55, 0.72);
+              "
+            >
+              New hiding spots, new fidgets, same cozy vibes 🌿
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1341,6 +1390,10 @@
         const playHint = document.getElementById("playHint");
         const closeOverlay = document.getElementById("closeOverlay");
 
+        const winOverlay = document.getElementById("winOverlay");
+        const winContinue = document.getElementById("winContinue");
+        const winStage = document.getElementById("winStage");
+
         bg.src = svgToDataUri(BG_SVG);
 
         // ---------- SFX ----------
@@ -1373,6 +1426,7 @@
         const COUNT = 22;
         let items = [];
         let found = 0;
+        let gameWon = false;
 
         const rand = (min, max) => Math.random() * (max - min) + min;
 
@@ -1458,9 +1512,47 @@
         // ---- PLAY CLEANUP (fixes spinner raf + stress ball listeners etc.) ----
         let currentPlayCleanup = null;
 
+        // ---- WIN OVERLAY HELPERS ----
+        function hideWinUI() {
+          winOverlay.style.display = "none";
+          winOverlay.setAttribute("aria-hidden", "true");
+          winStage.classList.remove("winPop");
+        }
+
+        function openWin() {
+          if (gameWon) return;
+          gameWon = true;
+
+          // close play overlay if it’s open
+          closePlay();
+
+          winOverlay.style.display = "flex";
+          winOverlay.setAttribute("aria-hidden", "false");
+
+          // re-trigger pop animation
+          winStage.classList.remove("winPop");
+          void winStage.offsetWidth;
+          winStage.classList.add("winPop");
+
+          // extra celebration
+          glitterBurstPercent(50, 45);
+          sparkleAtPercent(50, 45);
+          beep("pop");
+        }
+
+        function closeWinAndReset() {
+          hideWinUI();
+          gameWon = false;
+          buildRound();
+        }
+
         function buildRound() {
           // stop any play mode that might still be running
           closePlay();
+
+          // also hide win overlay if it’s open
+          hideWinUI();
+          gameWon = false;
 
           // clear room + fx + any flying clones
           room
@@ -1543,15 +1635,17 @@
         }
 
         function reshufflePositions() {
+          if (gameWon) return;
           randomizeUnfoundPositions();
         }
 
         function restartGame() {
           beep("click");
-          buildRound();
+          closeWinAndReset();
         }
 
         function onFind(it, el, img, e) {
+          if (gameWon) return;
           if (el.dataset.justDragged) return;
           if (it.found) return;
 
@@ -1578,6 +1672,12 @@
           found++;
           foundCountEl.textContent = String(found);
           beep("pop");
+
+          // WIN CHECK
+          if (found >= items.length) {
+            // tiny delay so the last fly-to-tray feels satisfying
+            setTimeout(openWin, 520);
+          }
         }
 
         // ---- DRAGGING ----
@@ -1593,6 +1693,7 @@
           const roomRect = () => room.getBoundingClientRect();
 
           el.addEventListener("pointerdown", (e) => {
+            if (gameWon) return;
             if (it.found) return;
 
             dragging = true;
@@ -1716,6 +1817,8 @@
 
         // ---------- PLAY MODE ----------
         function openPlay(it) {
+          if (gameWon) return;
+
           overlay.style.display = "flex";
           overlay.setAttribute("aria-hidden", "false");
 
@@ -1768,6 +1871,12 @@
         closeOverlay.addEventListener("click", closePlay);
         overlay.addEventListener("click", (e) => {
           if (e.target === overlay) closePlay();
+        });
+
+        // WIN overlay interactions
+        winContinue.addEventListener("click", closeWinAndReset);
+        winOverlay.addEventListener("click", (e) => {
+          if (e.target === winOverlay) closeWinAndReset();
         });
 
         // Spinner (returns cleanup to stop RAF)
@@ -2014,6 +2123,8 @@
           }
           if (e.key === "Escape" && overlay.style.display === "flex")
             closePlay();
+          if (e.key === "Escape" && winOverlay.style.display === "flex")
+            closeWinAndReset();
         });
 
         // ---------- INIT ----------
