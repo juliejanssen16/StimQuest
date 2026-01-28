@@ -1,0 +1,1923 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Fidget Finder — YourHelp</title>
+    <style>
+      :root {
+        --bg: #070812;
+        --panel: rgba(255, 255, 255, 0.075);
+        --panel2: rgba(255, 255, 255, 0.105);
+        --stroke: rgba(255, 255, 255, 0.14);
+        --text: rgba(255, 255, 255, 0.93);
+        --muted: rgba(255, 255, 255, 0.68);
+        --accent: #a8ffe0;
+        --accent2: #b7a6ff;
+        --shadow: rgba(0, 0, 0, 0.55);
+        --shadow2: rgba(0, 0, 0, 0.25);
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background:
+          radial-gradient(
+            1200px 800px at 20% 10%,
+            rgba(183, 166, 255, 0.1),
+            transparent 55%
+          ),
+          radial-gradient(
+            900px 700px at 80% 20%,
+            rgba(168, 255, 224, 0.1),
+            transparent 55%
+          ),
+          radial-gradient(
+            1400px 900px at 50% 90%,
+            rgba(255, 154, 213, 0.07),
+            transparent 60%
+          ),
+          var(--bg);
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Arial;
+        color: var(--text);
+        overflow: hidden;
+      }
+
+      /* global soft grain */
+      body:before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.08;
+        background-image:
+          repeating-linear-gradient(
+            0deg,
+            rgba(255, 255, 255, 0.05) 0px,
+            rgba(255, 255, 255, 0.05) 1px,
+            transparent 1px,
+            transparent 3px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.04) 0px,
+            rgba(255, 255, 255, 0.04) 1px,
+            transparent 1px,
+            transparent 4px
+          );
+        mix-blend-mode: overlay;
+        filter: blur(0.2px);
+        z-index: 0;
+      }
+
+      /* LOGO */
+      .logo {
+        position: fixed;
+        top: 14px;
+        left: 14px;
+        width: 140px;
+        max-width: 32vw;
+        height: auto;
+        z-index: 999999;
+        pointer-events: none;
+        filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.6))
+          drop-shadow(0 0 18px rgba(168, 255, 224, 0.12));
+        opacity: 0.98;
+      }
+
+      .wrap {
+        height: 100%;
+        display: grid;
+        place-items: center;
+        padding: 16px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .layout {
+        width: min(1180px, 96vw);
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 14px;
+        align-items: start;
+      }
+      @media (max-width: 980px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .card {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.085),
+          rgba(255, 255, 255, 0.055)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 22px;
+        box-shadow: 0 30px 90px var(--shadow);
+        backdrop-filter: blur(14px);
+        overflow: hidden;
+      }
+
+      /* ROOM */
+      .room {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16/10;
+        border-radius: 22px;
+        overflow: hidden;
+        user-select: none;
+        background: #0c0e1f;
+        box-shadow: 0 18px 60px var(--shadow2);
+      }
+
+      .bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        pointer-events: none;
+        transform: scale(1.01);
+      }
+
+      .vignette {
+        position: absolute;
+        inset: -2px;
+        pointer-events: none;
+        background: radial-gradient(
+          900px 520px at 50% 45%,
+          rgba(0, 0, 0, 0) 40%,
+          rgba(0, 0, 0, 0.22) 100%
+        );
+        mix-blend-mode: multiply;
+      }
+
+      /* ITEMS IN ROOM (smooth + draggable) */
+      .item {
+        position: absolute;
+        left: var(--x, 50%);
+        top: var(--y, 50%);
+        width: var(--size, 54px);
+        height: var(--size, 54px);
+        transform: translate3d(-50%, -50%, 0);
+        cursor: grab;
+        user-select: none;
+        touch-action: none; /* IMPORTANT for drag on mobile */
+        z-index: var(--z, 3);
+        filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.55))
+          drop-shadow(0 0 18px rgba(168, 255, 224, 0.08));
+        will-change: transform;
+      }
+
+      .itemInner {
+        width: 100%;
+        height: 100%;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        will-change: transform, filter;
+        transition:
+          transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+          filter 220ms cubic-bezier(0.16, 1, 0.3, 1),
+          opacity 220ms ease;
+      }
+
+      .item img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 16px;
+        pointer-events: none;
+      }
+
+      @keyframes floatyJiggle {
+        0% {
+          transform: rotate(0deg) scale(1);
+        }
+        25% {
+          transform: rotate(-1.4deg) scale(1.045);
+        }
+        55% {
+          transform: rotate(1.8deg) scale(1.07);
+        }
+        80% {
+          transform: rotate(-1deg) scale(1.055);
+        }
+        100% {
+          transform: rotate(0deg) scale(1.06);
+        }
+      }
+
+      .item:hover .itemInner {
+        animation: floatyJiggle 900ms cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        filter: drop-shadow(0 22px 28px rgba(0, 0, 0, 0.6))
+          drop-shadow(0 0 26px rgba(168, 255, 224, 0.18));
+      }
+
+      .item:active .itemInner {
+        animation: none;
+        transform: scale(0.98);
+      }
+
+      .item.dragging {
+        cursor: grabbing;
+        filter: drop-shadow(0 26px 34px rgba(0, 0, 0, 0.65))
+          drop-shadow(0 0 34px rgba(168, 255, 224, 0.22));
+      }
+      .item.dragging .itemInner {
+        animation: none !important;
+        transform: scale(1.06);
+      }
+
+      .item.found {
+        opacity: 0;
+        pointer-events: none;
+        transform: translate3d(-50%, -50%, 0) scale(0.78);
+        filter: none;
+        animation: none !important;
+      }
+
+      @keyframes foundPop {
+        0% {
+          transform: rotate(0deg) scale(1);
+          opacity: 1;
+        }
+        55% {
+          transform: rotate(6deg) scale(1.22);
+          opacity: 1;
+        }
+        100% {
+          transform: rotate(-4deg) scale(0.78);
+          opacity: 0;
+        }
+      }
+      .item.foundPopAnim .itemInner {
+        animation: foundPop 320ms cubic-bezier(0.15, 0.9, 0.2, 1) forwards;
+      }
+
+      /* FIND FX */
+      .pulse {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border-radius: 999px;
+        border: 2px solid rgba(168, 255, 224, 0.95);
+        box-shadow: 0 0 40px rgba(168, 255, 224, 0.55);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        animation: pulse 0.55s ease forwards;
+      }
+      @keyframes pulse {
+        0% {
+          opacity: 0.92;
+          transform: translate(-50%, -50%) scale(0.6);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(3.4);
+        }
+      }
+
+      .spark {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(168, 255, 224, 0.95);
+        box-shadow: 0 0 22px rgba(168, 255, 224, 0.55);
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        pointer-events: none;
+        animation: spark 560ms cubic-bezier(0.15, 0.9, 0.2, 1) forwards;
+      }
+      @keyframes spark {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0.6);
+        }
+        18% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(2.1);
+        }
+      }
+
+      /* GLITTER STARS BURST */
+      .glitter {
+        position: absolute;
+        width: var(--gsize, 10px);
+        height: var(--gsize, 10px);
+        left: var(--gx);
+        top: var(--gy);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        opacity: 0;
+        filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.2));
+        animation: glitterFly var(--gdur, 700ms)
+          cubic-bezier(0.12, 0.9, 0.18, 1) forwards;
+      }
+      .glitter:before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 30% 25%,
+          rgba(255, 255, 255, 0.92),
+          rgba(183, 166, 255, 0.35)
+        );
+        clip-path: polygon(
+          50% 0%,
+          62% 34%,
+          98% 36%,
+          70% 58%,
+          80% 92%,
+          50% 72%,
+          20% 92%,
+          30% 58%,
+          2% 36%,
+          38% 34%
+        );
+        border-radius: 2px;
+        opacity: 0.95;
+      }
+      @keyframes glitterFly {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, -50%) rotate(0deg) scale(0.65);
+        }
+        18% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translate(calc(-50% + var(--gdx)), calc(-50% + var(--gdy)))
+            rotate(var(--grot)) scale(1.25);
+        }
+      }
+
+      /* SIDEBAR */
+      .title {
+        padding: 14px 14px 12px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        background:
+          radial-gradient(
+            900px 240px at 20% 0%,
+            rgba(183, 166, 255, 0.1),
+            transparent 55%
+          ),
+          radial-gradient(
+            900px 240px at 80% 0%,
+            rgba(168, 255, 224, 0.09),
+            transparent 55%
+          );
+      }
+
+      .title h1 {
+        margin: 0;
+        font-size: 14px;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+      }
+      .sub {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 12.5px;
+        line-height: 1.35;
+      }
+
+      .controls {
+        margin-top: 12px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .pill {
+        font-size: 12px;
+        color: var(--muted);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(0, 0, 0, 0.18);
+        padding: 7px 10px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.18);
+      }
+
+      .btn {
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(0, 0, 0, 0.16);
+        color: var(--text);
+        border-radius: 16px;
+        padding: 10px 12px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        transition:
+          transform 0.06s ease,
+          background 0.15s ease,
+          border-color 0.15s ease;
+        user-select: none;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.16);
+      }
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.07);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      .kbd {
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(0, 0, 0, 0.22);
+        padding: 2px 7px;
+        border-radius: 10px;
+      }
+
+      .sectionTitle {
+        padding: 12px 14px 0 14px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.72);
+        letter-spacing: 0.25px;
+      }
+
+      .list {
+        padding: 12px 14px 10px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 240px;
+        overflow: auto;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        background: rgba(0, 0, 0, 0.16);
+        box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.14);
+      }
+      .row img {
+        width: 30px;
+        height: 30px;
+        padding: 5px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .row .name {
+        font-size: 12px;
+      }
+      .row .tag {
+        margin-left: auto;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(0, 0, 0, 0.22);
+        padding: 4px 8px;
+        border-radius: 999px;
+      }
+      .row.done {
+        opacity: 0.56;
+        filter: grayscale(0.4);
+        text-decoration: line-through;
+      }
+
+      /* COLLECTION */
+      .collection {
+        padding: 12px 14px 14px 14px;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        max-height: 220px;
+        overflow: auto;
+      }
+      .toyBtn {
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(0, 0, 0, 0.16);
+        border-radius: 18px;
+        padding: 10px;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        transition:
+          transform 0.08s ease,
+          background 0.15s ease,
+          border-color 0.15s ease;
+        position: relative;
+        min-height: 62px;
+        box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.14);
+      }
+      .toyBtn:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.07);
+        border-color: rgba(255, 255, 255, 0.2);
+        animation: trayJiggle 700ms ease-in-out infinite;
+      }
+      .toyBtn:active {
+        animation: none;
+        transform: translateY(0px) scale(0.99);
+      }
+      @keyframes trayJiggle {
+        0% {
+          transform: translateY(-1px) rotate(0deg);
+        }
+        35% {
+          transform: translateY(-2px) rotate(-1.3deg);
+        }
+        70% {
+          transform: translateY(-2px) rotate(1.7deg);
+        }
+        100% {
+          transform: translateY(-1px) rotate(0deg);
+        }
+      }
+
+      .toyBtn img {
+        width: 46px;
+        height: 46px;
+        object-fit: contain;
+      }
+      .toyBtn .miniTag {
+        position: absolute;
+        bottom: 7px;
+        right: 8px;
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.7);
+        background: rgba(0, 0, 0, 0.28);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 2px 7px;
+        border-radius: 999px;
+      }
+
+      @keyframes trayPop {
+        0% {
+          transform: scale(0.82);
+          opacity: 0;
+        }
+        60% {
+          transform: scale(1.08);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .trayPop {
+        animation: trayPop 260ms cubic-bezier(0.15, 0.9, 0.2, 1) both;
+      }
+
+      .footer {
+        padding: 12px 14px 14px 14px;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      .credits {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.14);
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      /* Flying clone */
+      .fly {
+        position: fixed;
+        width: 56px;
+        height: 56px;
+        pointer-events: none;
+        z-index: 99999;
+        filter: drop-shadow(0 26px 32px rgba(0, 0, 0, 0.65))
+          drop-shadow(0 0 26px rgba(168, 255, 224, 0.18));
+        will-change: transform;
+      }
+
+      /* PLAY OVERLAY */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(
+          1200px 800px at 50% 40%,
+          rgba(183, 166, 255, 0.1),
+          rgba(0, 0, 0, 0.62)
+        );
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        z-index: 9999;
+      }
+      .modal {
+        width: min(720px, 94vw);
+        background: rgba(255, 255, 255, 0.085);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 24px;
+        padding: 14px;
+        backdrop-filter: blur(14px);
+        box-shadow: 0 30px 100px rgba(0, 0, 0, 0.7);
+        overflow: hidden;
+      }
+      .modalTop {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 8px 12px 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      }
+      .modalTop h2 {
+        margin: 0;
+        font-size: 14px;
+        letter-spacing: 0.3px;
+      }
+      .hint {
+        margin-top: 6px;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 12px;
+        line-height: 1.3;
+      }
+      .closeBtn {
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(0, 0, 0, 0.18);
+        color: var(--text);
+        border-radius: 16px;
+        padding: 10px 12px;
+        font-size: 12px;
+        cursor: pointer;
+        user-select: none;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.14);
+      }
+      .closeBtn:hover {
+        background: rgba(255, 255, 255, 0.07);
+      }
+
+      .stage {
+        margin-top: 12px;
+        padding: 14px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background:
+          radial-gradient(
+            800px 380px at 50% 20%,
+            rgba(168, 255, 224, 0.09),
+            transparent 60%
+          ),
+          radial-gradient(
+            800px 380px at 50% 90%,
+            rgba(255, 154, 213, 0.06),
+            transparent 60%
+          ),
+          rgba(0, 0, 0, 0.22);
+        min-height: 340px;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        position: relative;
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
+      }
+
+      /* spinner play */
+      .spinDisc {
+        width: 260px;
+        height: 260px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        touch-action: none;
+      }
+      .spinDisc img {
+        width: 260px;
+        height: 260px;
+        object-fit: contain;
+        filter: drop-shadow(0 22px 28px rgba(0, 0, 0, 0.55));
+      }
+
+      /* stress ball play */
+      .ball {
+        width: 250px;
+        height: 250px;
+        border-radius: 999px;
+        background: radial-gradient(
+          circle at 30% 25%,
+          rgba(255, 255, 255, 0.92),
+          rgba(255, 154, 213, 0.78) 55%,
+          rgba(124, 72, 255, 0.2)
+        );
+        box-shadow:
+          0 28px 70px rgba(0, 0, 0, 0.65),
+          inset 0 0 26px rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        touch-action: none;
+        transform: scale(1);
+        transition: transform 0.12s ease;
+        cursor: pointer;
+        position: relative;
+      }
+      .ball:after {
+        content: "";
+        position: absolute;
+        inset: 20%;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.1);
+        filter: blur(1px);
+        transform: rotate(-12deg);
+        opacity: 0.68;
+      }
+      .ball.squish {
+        transform: scale(0.92, 0.86);
+      }
+
+      /* marble mesh play */
+      .track {
+        width: min(560px, 92%);
+        height: 76px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.08),
+          rgba(0, 0, 0, 0.16)
+        );
+        box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.35);
+        position: relative;
+        touch-action: none;
+      }
+      .marble {
+        width: 58px;
+        height: 58px;
+        border-radius: 999px;
+        background: radial-gradient(
+          circle at 30% 25%,
+          rgba(255, 255, 255, 0.95),
+          rgba(46, 230, 255, 0.95)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        position: absolute;
+        top: 50%;
+        left: 10%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 22px 44px rgba(0, 0, 0, 0.5);
+        cursor: grab;
+        touch-action: none;
+      }
+      .marble:active {
+        cursor: grabbing;
+      }
+
+      /* pop-it play */
+      .popitWrap {
+        width: min(560px, 92%);
+        aspect-ratio: 1/1;
+        border-radius: 26px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background:
+          radial-gradient(
+            900px 700px at 30% 30%,
+            rgba(255, 154, 213, 0.22),
+            transparent 55%
+          ),
+          radial-gradient(
+            900px 700px at 80% 70%,
+            rgba(255, 210, 154, 0.22),
+            transparent 55%
+          ),
+          rgba(0, 0, 0, 0.12);
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        box-shadow: inset 0 0 36px rgba(0, 0, 0, 0.28);
+      }
+      .bubbles {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+      }
+      .bubble {
+        aspect-ratio: 1/1;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: radial-gradient(
+          circle at 30% 25%,
+          rgba(255, 255, 255, 0.14),
+          rgba(0, 0, 0, 0.2)
+        );
+        box-shadow:
+          inset 0 0 18px rgba(0, 0, 0, 0.4),
+          0 12px 22px rgba(0, 0, 0, 0.28);
+        cursor: pointer;
+        transition:
+          transform 0.09s ease,
+          background 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+      .bubble:active {
+        transform: scale(0.98);
+      }
+      .bubble.popped {
+        background: radial-gradient(
+          circle at 30% 25%,
+          rgba(255, 255, 255, 0.24),
+          rgba(0, 0, 0, 0.12)
+        );
+        box-shadow:
+          inset 0 0 12px rgba(255, 255, 255, 0.1),
+          0 10px 18px rgba(0, 0, 0, 0.22);
+        transform: translateY(4px);
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- your logo -->
+    <img class="logo" src="Logo.png" alt="Logo" />
+
+    <div class="wrap">
+      <div class="layout">
+        <!-- ROOM -->
+        <div class="card">
+          <div class="room" id="room">
+            <img class="bg" id="bg" alt="Room background" />
+            <div class="vignette"></div>
+          </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="card">
+          <div class="title">
+            <h1>Fidget Finder</h1>
+            <div class="sub">
+              Find hidden fidgets. Then keep them in your tray and play with
+              them. No timer. 🌿
+            </div>
+            <div class="controls">
+              <div class="pill">
+                Found:
+                <b
+                  id="foundCount"
+                  style="color: var(--accent); margin-left: 6px"
+                  >0</b
+                >/<span id="totalCount">0</span>
+              </div>
+              <div class="btn" id="shuffleBtn">
+                Shuffle <span class="kbd">R</span>
+              </div>
+              <div class="btn" id="sfxBtn">
+                SFX <span class="kbd" id="sfxTag">Off</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sectionTitle">To find</div>
+          <div class="list" id="list"></div>
+
+          <div class="sectionTitle">Your fidgets (click to play)</div>
+          <div class="collection" id="collection"></div>
+
+          <div class="footer">
+            Tips: shelf + desk edges + plant area. Sometimes “behind” stuff.
+            😉<br />
+            Keys: <span class="kbd">R</span> reshuffle ·
+            <span class="kbd">M</span> toggle SFX ·
+            <span class="kbd">Esc</span> close play
+            <div class="credits">Made by <b>YourHelp</b> 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAY OVERLAY -->
+    <div class="overlay" id="overlay" aria-hidden="true">
+      <div class="modal">
+        <div class="modalTop">
+          <div>
+            <h2 id="playTitle">Play</h2>
+            <div class="hint" id="playHint">Interact with your fidget.</div>
+          </div>
+          <div class="closeBtn" id="closeOverlay">Close</div>
+        </div>
+        <div class="stage" id="stage"></div>
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        // ---------- SVG HELPERS ----------
+        const svgToDataUri = (svg) =>
+          "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg.trim());
+
+        // ---------- ROOM BACKGROUND (same as previous premium bg) ----------
+        const BG_SVG = `
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+    <defs>
+      <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2e2a5b"/>
+        <stop offset="0.55" stop-color="#171a34"/>
+        <stop offset="1" stop-color="#0c0d18"/>
+      </linearGradient>
+
+      <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#0b0c16"/>
+        <stop offset="1" stop-color="#070812"/>
+      </linearGradient>
+
+      <radialGradient id="windowGlow" cx="20%" cy="22%" r="65%">
+        <stop offset="0" stop-color="#a8ffe0" stop-opacity="0.25"/>
+        <stop offset="0.55" stop-color="#b7a6ff" stop-opacity="0.12"/>
+        <stop offset="1" stop-color="#000" stop-opacity="0"/>
+      </radialGradient>
+
+      <radialGradient id="lampGlow" cx="78%" cy="18%" r="70%">
+        <stop offset="0" stop-color="#a8ffe0" stop-opacity="0.22"/>
+        <stop offset="1" stop-color="#000" stop-opacity="0"/>
+      </radialGradient>
+
+      <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+        <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000" flood-opacity="0.55"/>
+      </filter>
+
+      <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="0.6"/>
+      </filter>
+
+      <pattern id="grain" width="120" height="120" patternUnits="userSpaceOnUse">
+        <circle cx="12" cy="18" r="1.2" fill="rgba(255,255,255,0.06)"/>
+        <circle cx="44" cy="30" r="1.1" fill="rgba(255,255,255,0.05)"/>
+        <circle cx="78" cy="20" r="1.0" fill="rgba(255,255,255,0.04)"/>
+        <circle cx="26" cy="66" r="1.0" fill="rgba(255,255,255,0.04)"/>
+        <circle cx="96" cy="74" r="1.2" fill="rgba(255,255,255,0.05)"/>
+        <circle cx="58" cy="92" r="1.0" fill="rgba(255,255,255,0.04)"/>
+      </pattern>
+
+      <linearGradient id="deskTop" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#0e1021"/>
+        <stop offset="1" stop-color="#090a14"/>
+      </linearGradient>
+
+      <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="rgba(255,255,255,0.20)"/>
+        <stop offset="1" stop-color="rgba(255,255,255,0.05)"/>
+      </linearGradient>
+
+      <linearGradient id="neon" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#b7a6ff"/>
+        <stop offset="0.5" stop-color="#a8ffe0"/>
+        <stop offset="1" stop-color="#ff9ad5"/>
+      </linearGradient>
+    </defs>
+
+    <rect width="1600" height="740" fill="url(#wall)"/>
+    <rect y="740" width="1600" height="260" fill="url(#floor)"/>
+    <rect width="1600" height="740" fill="url(#windowGlow)"/>
+    <rect width="1600" height="740" fill="url(#lampGlow)"/>
+    <rect width="1600" height="740" fill="url(#grain)" opacity="0.55" filter="url(#soft)"/>
+
+    <g opacity="0.8" filter="url(#shadow)">
+      <rect x="120" y="90" width="1360" height="10" rx="5" fill="url(#neon)" opacity="0.55"/>
+      <rect x="120" y="90" width="1360" height="10" rx="5" fill="url(#neon)" opacity="0.25" filter="url(#soft)"/>
+    </g>
+
+    <g filter="url(#shadow)">
+      <rect x="110" y="150" width="500" height="320" rx="26" fill="#0a0b18" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
+      <path d="M110 310h500" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
+      <path d="M360 150v320" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
+      <circle cx="220" cy="250" r="84" fill="#a8ffe0" opacity="0.10"/>
+      <circle cx="510" cy="280" r="110" fill="#b7a6ff" opacity="0.08"/>
+    </g>
+
+    <g filter="url(#shadow)">
+      <rect x="660" y="130" width="190" height="240" rx="22" fill="#0b0c18" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+      <rect x="690" y="160" width="130" height="160" rx="18" fill="url(#neon)" opacity="0.20"/>
+      <path d="M705 308c30-42 66-58 100-60" stroke="rgba(255,255,255,0.25)" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="752" cy="232" r="20" fill="#ff9ad5" opacity="0.18"/>
+
+      <rect x="880" y="150" width="240" height="210" rx="22" fill="#0b0c18" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+      <rect x="910" y="180" width="180" height="140" rx="18" fill="#a8ffe0" opacity="0.12"/>
+      <path d="M940 300h140" stroke="rgba(255,255,255,0.22)" stroke-width="5" stroke-linecap="round"/>
+    </g>
+
+    <g filter="url(#shadow)">
+      <rect x="720" y="420" width="780" height="28" rx="14" fill="#1a1b33" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
+      <rect x="750" y="360" width="120" height="55" rx="14" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
+      <rect x="890" y="350" width="90" height="70" rx="16" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
+      <rect x="1000" y="360" width="160" height="60" rx="16" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
+      <circle cx="1260" cy="386" r="28" fill="#ff9ad5" opacity="0.18"/>
+      <circle cx="1330" cy="388" r="22" fill="#a8ffe0" opacity="0.16"/>
+      <rect x="1370" y="360" width="90" height="58" rx="18" fill="url(#glass)" opacity="0.35" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+    </g>
+
+    <g filter="url(#shadow)">
+      <path d="M160 720h1280v190a34 34 0 0 1-34 34H194a34 34 0 0 1-34-34V720z"
+        fill="url(#deskTop)" stroke="rgba(255,255,255,0.11)" stroke-width="2"/>
+      <rect x="230" y="785" width="360" height="135" rx="20" fill="#070812" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
+      <rect x="630" y="785" width="360" height="135" rx="20" fill="#070812" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
+      <rect x="1030" y="785" width="340" height="135" rx="20" fill="#070812" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
+      <rect x="560" y="705" width="480" height="70" rx="20" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+      <g opacity="0.55">
+        ${Array.from({ length: 14 })
+          .map(
+            (_, i) =>
+              `<rect x="${585 + i * 32}" y="724" width="24" height="18" rx="6" fill="rgba(255,255,255,0.10)"/>`,
+          )
+          .join("")}
+      </g>
+    </g>
+
+    <g filter="url(#shadow)">
+      <rect x="1285" y="560" width="170" height="220" rx="30" fill="#0b0c18" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
+      <path d="M1370 560c-16-70 18-160 86-198 22 46 14 134-38 198" fill="#a8ffe0" opacity="0.22"/>
+      <path d="M1370 560c-48-58-84-134-58-206 58 22 108 124 96 206" fill="#a8ffe0" opacity="0.18"/>
+      <path d="M1370 560c-38-46-106-102-174-96 22 62 96 132 174 96" fill="#b7a6ff" opacity="0.12"/>
+    </g>
+
+    <g opacity="0.9">
+      <ellipse cx="780" cy="925" rx="600" ry="120" fill="#a8ffe0" opacity="0.06"/>
+      <ellipse cx="780" cy="925" rx="460" ry="92" fill="#ff9ad5" opacity="0.05"/>
+    </g>
+  </svg>`;
+
+        // ---------- GLITTER HELPERS (inside SVG shapes) ----------
+        const glitterStars = (seed = 0) => {
+          const stars = [
+            { x: 34 + seed * 2, y: 30, s: 1.0, d: 1.8, b: 0.0 },
+            { x: 92, y: 40 + seed, s: 0.9, d: 2.3, b: 0.4 },
+            { x: 48, y: 92, s: 0.8, d: 2.0, b: 0.2 },
+            { x: 78, y: 88, s: 0.7, d: 2.6, b: 0.6 },
+          ];
+          return `
+      <g opacity="0.9">
+        ${stars
+          .map(
+            (st) => `
+          <g transform="translate(${st.x} ${st.y}) scale(${st.s})">
+            <path d="M0-6 L1.6-1.8 L6 0 L1.6 1.8 L0 6 L-1.6 1.8 L-6 0 L-1.6 -1.8 Z"
+              fill="rgba(255,255,255,.85)" opacity="0.0">
+              <animate attributeName="opacity" values="0;0.9;0" dur="${st.d}s" repeatCount="indefinite" begin="${st.b}s"/>
+            </path>
+          </g>
+        `,
+          )
+          .join("")}
+      </g>
+    `;
+        };
+
+        // ---------- FIDGET SPRITES (now with glitter stars inside) ----------
+        const FIDGET_SVGS = {
+          "Pop-it": () => `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+        <defs>
+          <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ff8fcf"/>
+            <stop offset="0.55" stop-color="#ffd38f"/>
+            <stop offset="1" stop-color="#a8ffe0"/>
+          </linearGradient>
+          <radialGradient id="shine" cx="25%" cy="18%" r="60%">
+            <stop offset="0" stop-color="rgba(255,255,255,0.55)"/>
+            <stop offset="1" stop-color="rgba(255,255,255,0)"/>
+          </radialGradient>
+        </defs>
+        <rect x="14" y="14" width="100" height="100" rx="22" fill="url(#body)"/>
+        <rect x="16" y="16" width="96" height="96" rx="20" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="3"/>
+        <rect x="18" y="18" width="92" height="92" rx="18" fill="url(#shine)" opacity="0.45"/>
+        ${glitterStars(0)}
+        ${[0, 1, 2]
+          .map((r) =>
+            [0, 1, 2]
+              .map((c) => {
+                const cx = 41 + c * 23,
+                  cy = 41 + r * 23;
+                return `
+            <circle cx="${cx}" cy="${cy}" r="9.2" fill="rgba(0,0,0,.16)"/>
+            <circle cx="${cx - 1}" cy="${cy - 1}" r="9.2" fill="rgba(255,255,255,.16)"/>
+            <circle cx="${cx + 1}" cy="${cy + 1}" r="7.8" fill="rgba(0,0,0,.08)"/>
+          `;
+              })
+              .join(""),
+          )
+          .join("")}
+      </svg>`,
+
+          Spinner: () => `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+        <defs>
+          <radialGradient id="rg" cx="30%" cy="25%">
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset="0.45" stop-color="#a8ffe0"/>
+            <stop offset="1" stop-color="#4a5cff"/>
+          </radialGradient>
+          <radialGradient id="metal" cx="35%" cy="30%">
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset="1" stop-color="#7a86ff"/>
+          </radialGradient>
+        </defs>
+        <path d="M64 18c11 0 20 9 20 20 0 6-3 11-6 15l11 20c3-1 6-2 10-2 11 0 20 9 20 20s-9 20-20 20c-8 0-14-4-18-11H47c-4 7-10 11-18 11-11 0-20-9-20-20s9-20 20-20c4 0 7 1 10 2l11-20c-3-4-6-9-6-15 0-11 9-20 20-20z"
+          fill="url(#rg)" stroke="rgba(255,255,255,.22)" stroke-width="3"/>
+        ${glitterStars(1)}
+        <circle cx="64" cy="64" r="16" fill="rgba(0,0,0,.20)"/>
+        <circle cx="64" cy="64" r="12" fill="url(#metal)" opacity="0.92"/>
+        <circle cx="64" cy="64" r="6" fill="rgba(0,0,0,.12)"/>
+      </svg>`,
+
+          "Infinity Cube": () => `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+        <defs>
+          <linearGradient id="b" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#74d6ff"/>
+            <stop offset="1" stop-color="#b7a6ff"/>
+          </linearGradient>
+          <radialGradient id="h" cx="25%" cy="20%" r="70%">
+            <stop offset="0" stop-color="rgba(255,255,255,0.55)"/>
+            <stop offset="1" stop-color="rgba(255,255,255,0)"/>
+          </radialGradient>
+        </defs>
+        <rect x="18" y="26" width="50" height="50" rx="12" fill="url(#b)" stroke="rgba(255,255,255,.22)" stroke-width="3"/>
+        <rect x="62" y="54" width="50" height="50" rx="12" fill="url(#b)" opacity="0.95" stroke="rgba(255,255,255,.22)" stroke-width="3"/>
+        <rect x="20" y="28" width="46" height="46" rx="11" fill="url(#h)" opacity="0.35"/>
+        <rect x="64" y="56" width="46" height="46" rx="11" fill="url(#h)" opacity="0.28"/>
+        ${glitterStars(2)}
+        <path d="M64 50c-10 0-18-8-18-18" stroke="rgba(255,255,255,.28)" stroke-width="7" stroke-linecap="round"/>
+        <path d="M64 78c10 0 18 8 18 18" stroke="rgba(255,255,255,.28)" stroke-width="7" stroke-linecap="round"/>
+      </svg>`,
+
+          Tangle: () => `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+        <defs>
+          <linearGradient id="t" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#a8ffe0"/>
+            <stop offset="0.55" stop-color="#ffffff"/>
+            <stop offset="1" stop-color="#ff9ad5"/>
+          </linearGradient>
+        </defs>
+        <path d="M28 74c0-24 20-44 44-44s44 20 44 44-20 44-44 44c-11 0-22-4-30-11"
+          fill="none" stroke="url(#t)" stroke-width="18" stroke-linecap="round"/>
+        ${glitterStars(3)}
+        <circle cx="40" cy="90" r="11" fill="#b7a6ff" opacity="0.45"/>
+      </svg>`,
+
+          "Stress Ball": () => `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+        <defs>
+          <radialGradient id="s" cx="30%" cy="25%">
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset="0.50" stop-color="#ff9ad5"/>
+            <stop offset="1" stop-color="#4a5cff"/>
+          </radialGradient>
+        </defs>
+        <circle cx="64" cy="68" r="40" fill="url(#s)" stroke="rgba(255,255,255,.22)" stroke-width="3"/>
+        ${glitterStars(4)}
+        <path d="M40 86c11 10 37 10 48 0" stroke="rgba(0,0,0,.13)" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="48" cy="52" r="10" fill="rgba(255,255,255,.22)" opacity="0.65"/>
+      </svg>`,
+
+          "Marble Mesh": () => `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+        <defs>
+          <linearGradient id="mesh" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="rgba(255,255,255,0.16)"/>
+            <stop offset="1" stop-color="rgba(255,255,255,0.06)"/>
+          </linearGradient>
+          <radialGradient id="m" cx="30%" cy="25%">
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset="1" stop-color="#2fe6ff"/>
+          </radialGradient>
+        </defs>
+        <rect x="14" y="42" width="100" height="44" rx="22" fill="url(#mesh)" stroke="rgba(255,255,255,.20)" stroke-width="3"/>
+        ${glitterStars(5)}
+        <circle cx="64" cy="64" r="19" fill="url(#m)" stroke="rgba(0,0,0,.12)" stroke-width="3"/>
+        <path d="M24 64h80" stroke="rgba(255,255,255,.20)" stroke-width="7" stroke-linecap="round" opacity="0.85"/>
+      </svg>`,
+
+          "Mini Slinky": () => `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+        <defs>
+          <linearGradient id="sl" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#ff9ad5"/>
+            <stop offset="0.5" stop-color="#b7a6ff"/>
+            <stop offset="1" stop-color="#a8ffe0"/>
+          </linearGradient>
+        </defs>
+        ${glitterStars(6)}
+        ${[0, 1, 2, 3, 4, 5, 6]
+          .map((i) => {
+            const y = 34 + i * 8;
+            return `<ellipse cx="64" cy="${y}" rx="42" ry="13" fill="none" stroke="url(#sl)" stroke-width="6" opacity="${0.95 - i * 0.1}"/>`;
+          })
+          .join("")}
+      </svg>`,
+        };
+
+        // Expanded catalog
+        const variants = [
+          ["Pop-it (mini)", "Pop-it"],
+          ["Pop-it (soft)", "Pop-it"],
+          ["Pop-it (tiny)", "Pop-it"],
+          ["Pop-it (dream)", "Pop-it"],
+          ["Spinner (sleek)", "Spinner"],
+          ["Spinner (chunky)", "Spinner"],
+          ["Spinner (quiet)", "Spinner"],
+          ["Spinner (neon)", "Spinner"],
+          ["Infinity cube (small)", "Infinity Cube"],
+          ["Infinity cube (glossy)", "Infinity Cube"],
+          ["Infinity cube (cool)", "Infinity Cube"],
+          ["Tangle (mint)", "Tangle"],
+          ["Tangle (pastel)", "Tangle"],
+          ["Tangle (loop)", "Tangle"],
+          ["Stress ball (sparkle)", "Stress Ball"],
+          ["Stress ball (peach)", "Stress Ball"],
+          ["Stress ball (cloud)", "Stress Ball"],
+          ["Marble mesh (aqua)", "Marble Mesh"],
+          ["Marble mesh (blue)", "Marble Mesh"],
+          ["Marble mesh (icy)", "Marble Mesh"],
+          ["Mini slinky (rainbow)", "Mini Slinky"],
+          ["Mini slinky (pastel)", "Mini Slinky"],
+          ["Mini slinky (soft)", "Mini Slinky"],
+        ];
+        const fidgetCatalog = variants.map(([name, artKey]) => ({
+          name,
+          artKey,
+        }));
+
+        // ---------- DOM ----------
+        const room = document.getElementById("room");
+        const bg = document.getElementById("bg");
+        const listEl = document.getElementById("list");
+        const collectionEl = document.getElementById("collection");
+        const foundCountEl = document.getElementById("foundCount");
+        const totalCountEl = document.getElementById("totalCount");
+        const shuffleBtn = document.getElementById("shuffleBtn");
+        const sfxBtn = document.getElementById("sfxBtn");
+        const sfxTag = document.getElementById("sfxTag");
+
+        const overlay = document.getElementById("overlay");
+        const stage = document.getElementById("stage");
+        const playTitle = document.getElementById("playTitle");
+        const playHint = document.getElementById("playHint");
+        const closeOverlay = document.getElementById("closeOverlay");
+
+        bg.src = svgToDataUri(BG_SVG);
+
+        // ---------- SFX ----------
+        let sfxOn = false;
+        let audioCtx = null;
+        function beep(type = "soft") {
+          if (!sfxOn) return;
+          if (!audioCtx)
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const t0 = audioCtx.currentTime;
+
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = "sine";
+          const base = type === "pop" ? 420 : type === "click" ? 360 : 520;
+          o.frequency.setValueAtTime(base, t0);
+          o.frequency.exponentialRampToValueAtTime(base * 1.12, t0 + 0.06);
+
+          g.gain.setValueAtTime(0.0001, t0);
+          g.gain.exponentialRampToValueAtTime(0.05, t0 + 0.01);
+          g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.14);
+
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.start(t0);
+          o.stop(t0 + 0.16);
+        }
+
+        // ---------- GAME STATE ----------
+        const COUNT = 22;
+        let items = [];
+        let found = 0;
+
+        const rand = (min, max) => Math.random() * (max - min) + min;
+
+        const zones = [
+          { x1: 12, y1: 18, x2: 42, y2: 46 },
+          { x1: 52, y1: 20, x2: 92, y2: 46 },
+          { x1: 14, y1: 56, x2: 88, y2: 93 },
+          { x1: 76, y1: 52, x2: 95, y2: 78 },
+        ];
+
+        function sparkleAtPercent(px, py) {
+          const pulse = document.createElement("div");
+          pulse.className = "pulse";
+          pulse.style.left = px + "%";
+          pulse.style.top = py + "%";
+          pulse.style.zIndex = "999";
+          room.appendChild(pulse);
+          setTimeout(() => pulse.remove(), 650);
+
+          for (let i = 0; i < 7; i++) {
+            const s = document.createElement("div");
+            s.className = "spark";
+            const ang = Math.random() * Math.PI * 2;
+            const rad = 2 + Math.random() * 6;
+            s.style.left = px + Math.cos(ang) * rad + "%";
+            s.style.top = py + Math.sin(ang) * rad + "%";
+            room.appendChild(s);
+            setTimeout(() => s.remove(), 700);
+          }
+        }
+
+        function glitterBurstPercent(px, py) {
+          const count = 10;
+          for (let i = 0; i < count; i++) {
+            const g = document.createElement("div");
+            g.className = "glitter";
+
+            const dx = (Math.random() * 140 - 70).toFixed(1) + "px";
+            const dy = (Math.random() * 140 - 70).toFixed(1) + "px";
+            const rot = (Math.random() * 240 - 120).toFixed(1) + "deg";
+            const dur = (560 + Math.random() * 320).toFixed(0) + "ms";
+            const size = (8 + Math.random() * 8).toFixed(0) + "px";
+
+            g.style.setProperty("--gx", px + "%");
+            g.style.setProperty("--gy", py + "%");
+            g.style.setProperty("--gdx", dx);
+            g.style.setProperty("--gdy", dy);
+            g.style.setProperty("--grot", rot);
+            g.style.setProperty("--gdur", dur);
+            g.style.setProperty("--gsize", size);
+
+            room.appendChild(g);
+            setTimeout(() => g.remove(), 900);
+          }
+        }
+
+        function buildRound() {
+          room
+            .querySelectorAll(".item,.pulse,.spark,.glitter")
+            .forEach((n) => n.remove());
+          listEl.innerHTML = "";
+          collectionEl.innerHTML = "";
+          found = 0;
+          foundCountEl.textContent = "0";
+
+          const pool = [...fidgetCatalog].sort(() => Math.random() - 0.5);
+          const chosen = pool.slice(0, COUNT);
+
+          items = chosen.map((it, idx) => {
+            const zone = zones[Math.floor(Math.random() * zones.length)];
+            const size = Math.round(rand(38, 64));
+            return {
+              id: "f" + idx,
+              name: it.name,
+              artKey: it.artKey,
+              found: false,
+              x: rand(zone.x1, zone.x2),
+              y: rand(zone.y1, zone.y2),
+              size,
+              z: Math.floor(rand(2, 8)),
+            };
+          });
+
+          totalCountEl.textContent = String(items.length);
+
+          items.forEach((it) => {
+            const row = document.createElement("div");
+            row.className = "row";
+            row.dataset.id = it.id;
+
+            const icon = document.createElement("img");
+            icon.alt = it.name;
+            icon.src = svgToDataUri(
+              (FIDGET_SVGS[it.artKey] || FIDGET_SVGS["Spinner"])(),
+            );
+
+            const name = document.createElement("div");
+            name.className = "name";
+            name.textContent = it.name;
+
+            const tag = document.createElement("div");
+            tag.className = "tag";
+            tag.textContent = "Find";
+
+            row.append(icon, name, tag);
+            listEl.appendChild(row);
+
+            const el = document.createElement("div");
+            el.className = "item";
+            el.dataset.id = it.id;
+
+            // use vars (smoother + easier drag)
+            el.style.setProperty("--x", it.x + "%");
+            el.style.setProperty("--y", it.y + "%");
+            el.style.setProperty("--size", it.size + "px");
+            el.style.setProperty("--z", String(it.z));
+
+            const inner = document.createElement("div");
+            inner.className = "itemInner";
+
+            const img = document.createElement("img");
+            img.alt = it.name;
+            img.src = icon.src;
+
+            inner.appendChild(img);
+            el.appendChild(inner);
+
+            el.addEventListener("click", (e) => onFind(it, el, img, e));
+            room.appendChild(el);
+
+            makeDraggable(el, it);
+          });
+        }
+
+        function reshufflePositions() {
+          [...room.querySelectorAll(".item")].forEach((el) => {
+            const it = items.find((x) => x.id === el.dataset.id);
+            if (!it || it.found) return;
+            const zone = zones[Math.floor(Math.random() * zones.length)];
+            it.x = rand(zone.x1, zone.x2);
+            it.y = rand(zone.y1, zone.y2);
+            it.size = Math.round(rand(38, 64));
+            it.z = Math.floor(rand(2, 8));
+
+            el.style.setProperty("--x", it.x + "%");
+            el.style.setProperty("--y", it.y + "%");
+            el.style.setProperty("--size", it.size + "px");
+            el.style.setProperty("--z", String(it.z));
+          });
+        }
+
+        function onFind(it, el, img, e) {
+          // Prevent "click after drag" from counting as find
+          if (el.dataset.justDragged) return;
+
+          if (it.found) return;
+          it.found = true;
+
+          const rect = room.getBoundingClientRect();
+          const px = ((e.clientX - rect.left) / rect.width) * 100;
+          const py = ((e.clientY - rect.top) / rect.height) * 100;
+
+          sparkleAtPercent(px, py);
+          glitterBurstPercent(px, py);
+
+          const row = listEl.querySelector(`.row[data-id="${it.id}"]`);
+          if (row) {
+            row.classList.add("done");
+            row.querySelector(".tag").textContent = "Found";
+          }
+
+          // found pop animation (before disappearing)
+          el.classList.add("foundPopAnim");
+          setTimeout(() => el.classList.add("found"), 260);
+
+          flyToTray(img, it);
+
+          found++;
+          foundCountEl.textContent = String(found);
+          beep("pop");
+        }
+
+        // ---- DRAGGING ----
+        function makeDraggable(el, it) {
+          let dragging = false;
+          let moved = false;
+          let pointerId = null;
+
+          let startClient = { x: 0, y: 0 };
+          let startPct = { x: it.x, y: it.y };
+
+          const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+          const roomRect = () => room.getBoundingClientRect();
+
+          el.addEventListener("pointerdown", (e) => {
+            if (it.found) return;
+
+            dragging = true;
+            moved = false;
+            pointerId = e.pointerId;
+
+            el.classList.add("dragging");
+            el.setPointerCapture(pointerId);
+
+            startClient = { x: e.clientX, y: e.clientY };
+            startPct = { x: it.x, y: it.y };
+
+            // bring forward while dragging
+            it.z = 9;
+            el.style.setProperty("--z", String(it.z));
+          });
+
+          el.addEventListener("pointermove", (e) => {
+            if (!dragging || e.pointerId !== pointerId) return;
+
+            const r = roomRect();
+            const dx = e.clientX - startClient.x;
+            const dy = e.clientY - startClient.y;
+
+            if (Math.abs(dx) + Math.abs(dy) > 2) moved = true;
+
+            const dxPct = (dx / r.width) * 100;
+            const dyPct = (dy / r.height) * 100;
+
+            // clamp so item stays inside room
+            const insetX = (it.size / r.width) * 50;
+            const insetY = (it.size / r.height) * 50;
+
+            it.x = clamp(startPct.x + dxPct, insetX, 100 - insetX);
+            it.y = clamp(startPct.y + dyPct, insetY, 100 - insetY);
+
+            el.style.setProperty("--x", it.x + "%");
+            el.style.setProperty("--y", it.y + "%");
+          });
+
+          const endDrag = () => {
+            if (!dragging) return;
+            dragging = false;
+
+            el.classList.remove("dragging");
+
+            // prevent click-find if we moved
+            if (moved) {
+              el.dataset.justDragged = "1";
+              setTimeout(() => delete el.dataset.justDragged, 0);
+            }
+          };
+
+          el.addEventListener("pointerup", endDrag);
+          el.addEventListener("pointercancel", endDrag);
+        }
+
+        function flyToTray(img, it) {
+          const start = img.getBoundingClientRect();
+          const end = collectionEl.getBoundingClientRect();
+
+          const fly = document.createElement("img");
+          fly.className = "fly";
+          fly.src = img.src;
+          fly.alt = it.name;
+          fly.style.left = start.left + "px";
+          fly.style.top = start.top + "px";
+          fly.style.width = start.width + "px";
+          fly.style.height = start.height + "px";
+          document.body.appendChild(fly);
+
+          const destX = end.left + 26 + (collectionEl.children.length % 5) * 62;
+          const destY =
+            end.top + 26 + Math.floor(collectionEl.children.length / 5) * 74;
+
+          const dx = destX - start.left;
+          const dy = destY - start.top;
+
+          const rot = (Math.random() * 90 - 45).toFixed(1);
+
+          const anim = fly.animate(
+            [
+              {
+                transform: `translate3d(0px,0px,0) scale(1) rotate(0deg)`,
+                opacity: 1,
+              },
+              {
+                transform: `translate3d(${dx * 0.55}px,${dy * 0.55}px,0) scale(1.14) rotate(${rot * 0.4}deg)`,
+                opacity: 1,
+              },
+              {
+                transform: `translate3d(${dx}px,${dy}px,0) scale(0.95) rotate(${rot}deg)`,
+                opacity: 1,
+              },
+            ],
+            { duration: 720, easing: "cubic-bezier(.2,1,.2,1)" },
+          );
+
+          anim.onfinish = () => {
+            fly.remove();
+            addToCollection(it);
+          };
+        }
+
+        function addToCollection(it) {
+          const btn = document.createElement("div");
+          btn.className = "toyBtn trayPop";
+          btn.dataset.artKey = it.artKey;
+
+          const img = document.createElement("img");
+          img.alt = it.name;
+          img.src = svgToDataUri(
+            (FIDGET_SVGS[it.artKey] || FIDGET_SVGS["Spinner"])(),
+          );
+
+          const tag = document.createElement("div");
+          tag.className = "miniTag";
+          tag.textContent = "Play";
+
+          btn.append(img, tag);
+          btn.addEventListener("click", () => openPlay(it));
+          collectionEl.appendChild(btn);
+        }
+
+        // ---------- PLAY MODE ----------
+        function openPlay(it) {
+          overlay.style.display = "flex";
+          overlay.setAttribute("aria-hidden", "false");
+          stage.innerHTML = "";
+
+          playTitle.textContent = it.name;
+
+          if (it.artKey === "Spinner") {
+            playHint.textContent = "Drag/flick to spin. Tap for a boost.";
+            playSpinner();
+            return;
+          }
+          if (it.artKey === "Pop-it") {
+            playHint.textContent = "Pop/unpop bubbles. Super satisfying.";
+            playPopit();
+            return;
+          }
+          if (it.artKey === "Stress Ball") {
+            playHint.textContent = "Press and hold to squish.";
+            playStressBall();
+            return;
+          }
+          if (it.artKey === "Marble Mesh") {
+            playHint.textContent = "Drag the marble through the mesh.";
+            playMarble();
+            return;
+          }
+          if (it.artKey === "Mini Slinky") {
+            playHint.textContent = "Drag up/down to stretch it.";
+            playSlinky();
+            return;
+          }
+
+          playHint.textContent = "Click to wiggle, drag to rotate.";
+          playGeneric(it);
+        }
+
+        function closePlay() {
+          overlay.style.display = "none";
+          overlay.setAttribute("aria-hidden", "true");
+          stage.innerHTML = "";
+        }
+
+        closeOverlay.addEventListener("click", closePlay);
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) closePlay();
+        });
+
+        // Spinner
+        function playSpinner() {
+          const disc = document.createElement("div");
+          disc.className = "spinDisc";
+          const img = document.createElement("img");
+          img.src = svgToDataUri(FIDGET_SVGS["Spinner"]());
+          disc.appendChild(img);
+          stage.appendChild(disc);
+
+          let angle = 0,
+            vel = 0,
+            dragging = false,
+            lastX = 0;
+          const tick = () => {
+            angle += vel;
+            vel *= 0.985;
+            if (Math.abs(vel) < 0.02) vel = 0;
+            img.style.transform = `rotate(${angle}deg)`;
+            requestAnimationFrame(tick);
+          };
+          tick();
+
+          disc.addEventListener("pointerdown", (e) => {
+            dragging = true;
+            lastX = e.clientX;
+            vel += 6;
+            beep("click");
+            disc.setPointerCapture(e.pointerId);
+          });
+          disc.addEventListener("pointermove", (e) => {
+            if (!dragging) return;
+            const dx = e.clientX - lastX;
+            lastX = e.clientX;
+            vel += dx * 0.13;
+          });
+          disc.addEventListener("pointerup", () => (dragging = false));
+          disc.addEventListener("pointercancel", () => (dragging = false));
+          disc.addEventListener("click", () => {
+            vel += 14;
+            beep("click");
+          });
+        }
+
+        // Pop-it
+        function playPopit() {
+          const wrap = document.createElement("div");
+          wrap.className = "popitWrap";
+          const grid = document.createElement("div");
+          grid.className = "bubbles";
+
+          for (let i = 0; i < 25; i++) {
+            const b = document.createElement("div");
+            b.className = "bubble";
+            b.addEventListener("click", () => {
+              b.classList.toggle("popped");
+              beep("pop");
+            });
+            grid.appendChild(b);
+          }
+          wrap.appendChild(grid);
+          stage.appendChild(wrap);
+        }
+
+        // Stress ball
+        function playStressBall() {
+          const ball = document.createElement("div");
+          ball.className = "ball";
+          stage.appendChild(ball);
+
+          const down = () => {
+            ball.classList.add("squish");
+            beep("pop");
+          };
+          const up = () => {
+            ball.classList.remove("squish");
+          };
+
+          ball.addEventListener("pointerdown", down);
+          window.addEventListener("pointerup", up, { once: false });
+          ball.addEventListener("pointerleave", up);
+        }
+
+        // Marble mesh
+        function playMarble() {
+          const track = document.createElement("div");
+          track.className = "track";
+          const marble = document.createElement("div");
+          marble.className = "marble";
+          track.appendChild(marble);
+          stage.appendChild(track);
+
+          let dragging = false;
+
+          const moveTo = (clientX) => {
+            const r = track.getBoundingClientRect();
+            const x = Math.max(r.left + 29, Math.min(r.right - 29, clientX));
+            const pct = ((x - r.left) / r.width) * 100;
+            marble.style.left = pct + "%";
+          };
+
+          marble.addEventListener("pointerdown", (e) => {
+            dragging = true;
+            marble.setPointerCapture(e.pointerId);
+            beep("click");
+          });
+          marble.addEventListener("pointermove", (e) => {
+            if (!dragging) return;
+            moveTo(e.clientX);
+          });
+          marble.addEventListener("pointerup", () => (dragging = false));
+          marble.addEventListener("pointercancel", () => (dragging = false));
+
+          track.addEventListener("pointerdown", (e) => {
+            moveTo(e.clientX);
+            beep("click");
+          });
+        }
+
+        // Slinky
+        function playSlinky() {
+          const img = document.createElement("img");
+          img.src = svgToDataUri(FIDGET_SVGS["Mini Slinky"]());
+          img.alt = "Slinky";
+          img.style.width = "460px";
+          img.style.maxWidth = "92%";
+          img.style.filter = "drop-shadow(0 22px 28px rgba(0,0,0,.55))";
+          img.style.transformOrigin = "50% 50%";
+          img.style.touchAction = "none";
+          stage.appendChild(img);
+
+          let dragging = false,
+            baseY = 0;
+          img.addEventListener("pointerdown", (e) => {
+            dragging = true;
+            baseY = e.clientY;
+            img.setPointerCapture(e.pointerId);
+            beep("click");
+          });
+          img.addEventListener("pointermove", (e) => {
+            if (!dragging) return;
+            const dy = e.clientY - baseY;
+            const stretch = Math.max(0.7, Math.min(1.55, 1 + dy / 240));
+            img.style.transform = `scaleY(${stretch})`;
+          });
+          img.addEventListener("pointerup", () => {
+            dragging = false;
+            img.style.transform = "scaleY(1)";
+          });
+          img.addEventListener("pointercancel", () => {
+            dragging = false;
+            img.style.transform = "scaleY(1)";
+          });
+        }
+
+        // Generic
+        function playGeneric(it) {
+          const img = document.createElement("img");
+          img.src = svgToDataUri(
+            (FIDGET_SVGS[it.artKey] || FIDGET_SVGS["Spinner"])(),
+          );
+          img.alt = it.name;
+          img.style.width = "280px";
+          img.style.maxWidth = "92%";
+          img.style.filter = "drop-shadow(0 22px 28px rgba(0,0,0,.55))";
+          img.style.transformOrigin = "50% 50%";
+          img.style.touchAction = "none";
+          stage.appendChild(img);
+
+          let dragging = false,
+            start = null,
+            rot = 0;
+          img.addEventListener("click", () => {
+            img.animate(
+              [
+                { transform: `rotate(${rot}deg) scale(1)` },
+                { transform: `rotate(${rot + 12}deg) scale(1.07)` },
+                { transform: `rotate(${rot - 8}deg) scale(1.03)` },
+                { transform: `rotate(${rot}deg) scale(1)` },
+              ],
+              { duration: 260, easing: "cubic-bezier(.15,.9,.2,1)" },
+            );
+            beep("click");
+          });
+
+          img.addEventListener("pointerdown", (e) => {
+            dragging = true;
+            start = { x: e.clientX, rot };
+            img.setPointerCapture(e.pointerId);
+            beep("click");
+          });
+          img.addEventListener("pointermove", (e) => {
+            if (!dragging || !start) return;
+            const dx = e.clientX - start.x;
+            rot = start.rot + dx * 0.25;
+            img.style.transform = `rotate(${rot}deg)`;
+          });
+          img.addEventListener("pointerup", () => {
+            dragging = false;
+            start = null;
+          });
+          img.addEventListener("pointercancel", () => {
+            dragging = false;
+            start = null;
+          });
+        }
+
+        // ---------- CONTROLS ----------
+        shuffleBtn.addEventListener("click", reshufflePositions);
+
+        sfxBtn.addEventListener("click", async () => {
+          sfxOn = !sfxOn;
+          sfxTag.textContent = sfxOn ? "On" : "Off";
+          if (sfxOn) {
+            try {
+              if (!audioCtx)
+                audioCtx = new (
+                  window.AudioContext || window.webkitAudioContext
+                )();
+              await audioCtx.resume();
+            } catch {}
+            beep("click");
+          }
+        });
+
+        window.addEventListener("keydown", (e) => {
+          if (e.key.toLowerCase() === "r") reshufflePositions();
+          if (e.key.toLowerCase() === "m") {
+            sfxOn = !sfxOn;
+            sfxTag.textContent = sfxOn ? "On" : "Off";
+            if (sfxOn) beep("click");
+          }
+          if (e.key === "Escape" && overlay.style.display === "flex")
+            closePlay();
+        });
+
+        // ---------- INIT ----------
+        buildRound();
+      })();
+    </script>
+  </body>
+</html>
