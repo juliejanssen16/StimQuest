@@ -6,39 +6,67 @@
     <title>Fidget Finder — YourHelp</title>
     <style>
       :root {
-        --bg: #070812;
-        --panel: rgba(255, 255, 255, 0.075);
-        --panel2: rgba(255, 255, 255, 0.105);
-        --stroke: rgba(255, 255, 255, 0.14);
-        --text: rgba(255, 255, 255, 0.93);
-        --muted: rgba(255, 255, 255, 0.68);
-        --accent: #a8ffe0;
-        --accent2: #b7a6ff;
-        --shadow: rgba(0, 0, 0, 0.55);
-        --shadow2: rgba(0, 0, 0, 0.25);
+        /* Pastel rainbow (soft + airy) */
+        --bg: #fbf7ff; /* page base */
+        --panel: rgba(255, 255, 255, 0.72);
+        --panel2: rgba(255, 255, 255, 0.82);
+        --stroke: rgba(120, 90, 170, 0.18);
+
+        --text: rgba(32, 24, 55, 0.92);
+        --muted: rgba(32, 24, 55, 0.62);
+
+        --accent: #7ee7ff; /* aqua */
+        --accent2: #c7a6ff; /* lavender */
+        --shadow: rgba(35, 20, 60, 0.18);
+        --shadow2: rgba(35, 20, 60, 0.1);
+
+        /* extra rainbow helpers */
+        --pink: #ffb3da;
+        --peach: #ffd1a6;
+        --lemon: #fff1a6;
+        --mint: #b9ffd9;
+        --sky: #a6e7ff;
+        --lilac: #cdb8ff;
       }
 
       html,
       body {
         height: 100%;
         margin: 0;
+
+        /* Pastel rainbow sky */
         background:
           radial-gradient(
-            1200px 800px at 20% 10%,
-            rgba(183, 166, 255, 0.1),
+            1000px 760px at 18% 12%,
+            rgba(255, 179, 218, 0.55),
             transparent 55%
           ),
           radial-gradient(
-            900px 700px at 80% 20%,
-            rgba(168, 255, 224, 0.1),
+            900px 720px at 82% 16%,
+            rgba(166, 231, 255, 0.55),
             transparent 55%
           ),
           radial-gradient(
-            1400px 900px at 50% 90%,
-            rgba(255, 154, 213, 0.07),
+            1100px 820px at 50% 88%,
+            rgba(185, 255, 217, 0.55),
             transparent 60%
           ),
-          var(--bg);
+          radial-gradient(
+            900px 700px at 35% 58%,
+            rgba(255, 241, 166, 0.45),
+            transparent 60%
+          ),
+          radial-gradient(
+            1000px 780px at 70% 62%,
+            rgba(205, 184, 255, 0.48),
+            transparent 62%
+          ),
+          linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.92),
+            rgba(251, 247, 255, 1)
+          );
+
         font-family:
           ui-sans-serif,
           system-ui,
@@ -50,29 +78,29 @@
         overflow: hidden;
       }
 
-      /* global soft grain */
+      /* global soft grain (lighter + warmer) */
       body:before {
         content: "";
         position: fixed;
         inset: 0;
         pointer-events: none;
-        opacity: 0.08;
+        opacity: 0.05;
         background-image:
           repeating-linear-gradient(
             0deg,
-            rgba(255, 255, 255, 0.05) 0px,
-            rgba(255, 255, 255, 0.05) 1px,
+            rgba(32, 24, 55, 0.06) 0px,
+            rgba(32, 24, 55, 0.06) 1px,
             transparent 1px,
             transparent 3px
           ),
           repeating-linear-gradient(
             90deg,
-            rgba(255, 255, 255, 0.04) 0px,
-            rgba(255, 255, 255, 0.04) 1px,
+            rgba(32, 24, 55, 0.05) 0px,
+            rgba(32, 24, 55, 0.05) 1px,
             transparent 1px,
             transparent 4px
           );
-        mix-blend-mode: overlay;
+        mix-blend-mode: soft-light;
         filter: blur(0.2px);
         z-index: 0;
       }
@@ -87,8 +115,8 @@
         height: auto;
         z-index: 999999;
         pointer-events: none;
-        filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.6))
-          drop-shadow(0 0 18px rgba(168, 255, 224, 0.12));
+        filter: drop-shadow(0 14px 26px rgba(35, 20, 60, 0.18))
+          drop-shadow(0 0 18px rgba(166, 231, 255, 0.24));
         opacity: 0.98;
       }
 
@@ -115,15 +143,11 @@
       }
 
       .card {
-        background: linear-gradient(
-          180deg,
-          rgba(255, 255, 255, 0.085),
-          rgba(255, 255, 255, 0.055)
-        );
-        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: linear-gradient(180deg, var(--panel2), var(--panel));
+        border: 1px solid var(--stroke);
         border-radius: 22px;
-        box-shadow: 0 30px 90px var(--shadow);
-        backdrop-filter: blur(14px);
+        box-shadow: 0 26px 80px var(--shadow);
+        backdrop-filter: blur(18px);
         overflow: hidden;
       }
 
@@ -135,7 +159,7 @@
         border-radius: 22px;
         overflow: hidden;
         user-select: none;
-        background: #0c0e1f;
+        background: rgba(255, 255, 255, 0.32);
         box-shadow: 0 18px 60px var(--shadow2);
       }
 
@@ -155,8 +179,8 @@
         pointer-events: none;
         background: radial-gradient(
           900px 520px at 50% 45%,
-          rgba(0, 0, 0, 0) 40%,
-          rgba(0, 0, 0, 0.22) 100%
+          rgba(255, 255, 255, 0) 40%,
+          rgba(35, 20, 60, 0.07) 100%
         );
         mix-blend-mode: multiply;
       }
@@ -171,10 +195,10 @@
         transform: translate3d(-50%, -50%, 0);
         cursor: grab;
         user-select: none;
-        touch-action: none; /* IMPORTANT for drag on mobile */
+        touch-action: none;
         z-index: var(--z, 3);
-        filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.55))
-          drop-shadow(0 0 18px rgba(168, 255, 224, 0.08));
+        filter: drop-shadow(0 14px 18px rgba(35, 20, 60, 0.18))
+          drop-shadow(0 0 18px rgba(166, 231, 255, 0.18));
         will-change: transform;
       }
 
@@ -219,8 +243,8 @@
 
       .item:hover .itemInner {
         animation: floatyJiggle 900ms cubic-bezier(0.16, 1, 0.3, 1) infinite;
-        filter: drop-shadow(0 22px 28px rgba(0, 0, 0, 0.6))
-          drop-shadow(0 0 26px rgba(168, 255, 224, 0.18));
+        filter: drop-shadow(0 18px 22px rgba(35, 20, 60, 0.2))
+          drop-shadow(0 0 22px rgba(255, 179, 218, 0.28));
       }
 
       .item:active .itemInner {
@@ -230,8 +254,8 @@
 
       .item.dragging {
         cursor: grabbing;
-        filter: drop-shadow(0 26px 34px rgba(0, 0, 0, 0.65))
-          drop-shadow(0 0 34px rgba(168, 255, 224, 0.22));
+        filter: drop-shadow(0 18px 26px rgba(35, 20, 60, 0.22))
+          drop-shadow(0 0 26px rgba(166, 231, 255, 0.28));
       }
       .item.dragging .itemInner {
         animation: none !important;
@@ -270,8 +294,8 @@
         width: 16px;
         height: 16px;
         border-radius: 999px;
-        border: 2px solid rgba(168, 255, 224, 0.95);
-        box-shadow: 0 0 40px rgba(168, 255, 224, 0.55);
+        border: 2px solid rgba(126, 231, 255, 0.95);
+        box-shadow: 0 0 36px rgba(126, 231, 255, 0.35);
         transform: translate(-50%, -50%);
         pointer-events: none;
         animation: pulse 0.55s ease forwards;
@@ -292,8 +316,8 @@
         width: 10px;
         height: 10px;
         border-radius: 999px;
-        background: rgba(168, 255, 224, 0.95);
-        box-shadow: 0 0 22px rgba(168, 255, 224, 0.55);
+        background: rgba(255, 179, 218, 0.9);
+        box-shadow: 0 0 18px rgba(255, 179, 218, 0.35);
         transform: translate(-50%, -50%);
         opacity: 0;
         pointer-events: none;
@@ -323,7 +347,7 @@
         transform: translate(-50%, -50%);
         pointer-events: none;
         opacity: 0;
-        filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.2));
+        filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.35));
         animation: glitterFly var(--gdur, 700ms)
           cubic-bezier(0.12, 0.9, 0.18, 1) forwards;
       }
@@ -333,8 +357,8 @@
         inset: 0;
         background: radial-gradient(
           circle at 30% 25%,
-          rgba(255, 255, 255, 0.92),
-          rgba(183, 166, 255, 0.35)
+          rgba(255, 255, 255, 0.95),
+          rgba(205, 184, 255, 0.55)
         );
         clip-path: polygon(
           50% 0%,
@@ -369,16 +393,16 @@
       /* SIDEBAR */
       .title {
         padding: 14px 14px 12px 14px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        border-bottom: 1px solid rgba(120, 90, 170, 0.16);
         background:
           radial-gradient(
-            900px 240px at 20% 0%,
-            rgba(183, 166, 255, 0.1),
+            900px 240px at 18% 0%,
+            rgba(255, 179, 218, 0.35),
             transparent 55%
           ),
           radial-gradient(
-            900px 240px at 80% 0%,
-            rgba(168, 255, 224, 0.09),
+            900px 240px at 82% 0%,
+            rgba(166, 231, 255, 0.35),
             transparent 55%
           );
       }
@@ -407,20 +431,20 @@
       .pill {
         font-size: 12px;
         color: var(--muted);
-        border: 1px solid rgba(255, 255, 255, 0.16);
-        background: rgba(0, 0, 0, 0.18);
+        border: 1px solid rgba(120, 90, 170, 0.18);
+        background: rgba(255, 255, 255, 0.55);
         padding: 7px 10px;
         border-radius: 999px;
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.18);
+        box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.35);
       }
 
       .btn {
         cursor: pointer;
-        border: 1px solid rgba(255, 255, 255, 0.16);
-        background: rgba(0, 0, 0, 0.16);
+        border: 1px solid rgba(120, 90, 170, 0.18);
+        background: rgba(255, 255, 255, 0.55);
         color: var(--text);
         border-radius: 16px;
         padding: 10px 12px;
@@ -434,11 +458,11 @@
           background 0.15s ease,
           border-color 0.15s ease;
         user-select: none;
-        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.16);
+        box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.35);
       }
       .btn:hover {
-        background: rgba(255, 255, 255, 0.07);
-        border-color: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.7);
+        border-color: rgba(120, 90, 170, 0.22);
       }
       .btn:active {
         transform: translateY(1px);
@@ -448,9 +472,9 @@
         font-family:
           ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         font-size: 11px;
-        color: rgba(255, 255, 255, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.16);
-        background: rgba(0, 0, 0, 0.22);
+        color: rgba(32, 24, 55, 0.75);
+        border: 1px solid rgba(120, 90, 170, 0.18);
+        background: rgba(255, 255, 255, 0.6);
         padding: 2px 7px;
         border-radius: 10px;
       }
@@ -458,7 +482,7 @@
       .sectionTitle {
         padding: 12px 14px 0 14px;
         font-size: 12px;
-        color: rgba(255, 255, 255, 0.72);
+        color: rgba(32, 24, 55, 0.7);
         letter-spacing: 0.25px;
       }
 
@@ -475,18 +499,18 @@
         gap: 10px;
         align-items: center;
         padding: 10px 10px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(120, 90, 170, 0.16);
         border-radius: 16px;
-        background: rgba(0, 0, 0, 0.16);
-        box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.14);
+        background: rgba(255, 255, 255, 0.55);
+        box-shadow: inset 0 0 22px rgba(255, 255, 255, 0.35);
       }
       .row img {
         width: 30px;
         height: 30px;
         padding: 5px;
         border-radius: 14px;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.65);
+        border: 1px solid rgba(120, 90, 170, 0.14);
       }
       .row .name {
         font-size: 12px;
@@ -494,15 +518,15 @@
       .row .tag {
         margin-left: auto;
         font-size: 11px;
-        color: rgba(255, 255, 255, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        background: rgba(0, 0, 0, 0.22);
+        color: rgba(32, 24, 55, 0.7);
+        border: 1px solid rgba(120, 90, 170, 0.16);
+        background: rgba(255, 255, 255, 0.65);
         padding: 4px 8px;
         border-radius: 999px;
       }
       .row.done {
-        opacity: 0.56;
-        filter: grayscale(0.4);
+        opacity: 0.65;
+        filter: grayscale(0.25);
         text-decoration: line-through;
       }
 
@@ -516,8 +540,8 @@
         overflow: auto;
       }
       .toyBtn {
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        background: rgba(0, 0, 0, 0.16);
+        border: 1px solid rgba(120, 90, 170, 0.16);
+        background: rgba(255, 255, 255, 0.55);
         border-radius: 18px;
         padding: 10px;
         display: grid;
@@ -529,12 +553,12 @@
           border-color 0.15s ease;
         position: relative;
         min-height: 62px;
-        box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.14);
+        box-shadow: inset 0 0 22px rgba(255, 255, 255, 0.35);
       }
       .toyBtn:hover {
         transform: translateY(-1px);
-        background: rgba(255, 255, 255, 0.07);
-        border-color: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.7);
+        border-color: rgba(120, 90, 170, 0.22);
         animation: trayJiggle 700ms ease-in-out infinite;
       }
       .toyBtn:active {
@@ -566,9 +590,9 @@
         bottom: 7px;
         right: 8px;
         font-size: 10px;
-        color: rgba(255, 255, 255, 0.7);
-        background: rgba(0, 0, 0, 0.28);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(32, 24, 55, 0.7);
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(120, 90, 170, 0.14);
         padding: 2px 7px;
         border-radius: 999px;
       }
@@ -593,7 +617,7 @@
 
       .footer {
         padding: 12px 14px 14px 14px;
-        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        border-top: 1px solid rgba(120, 90, 170, 0.16);
         color: var(--muted);
         font-size: 12px;
         line-height: 1.4;
@@ -601,9 +625,9 @@
       .credits {
         margin-top: 10px;
         padding-top: 10px;
-        border-top: 1px dashed rgba(255, 255, 255, 0.14);
+        border-top: 1px dashed rgba(120, 90, 170, 0.18);
         font-size: 11px;
-        color: rgba(255, 255, 255, 0.6);
+        color: rgba(32, 24, 55, 0.55);
       }
 
       /* Flying clone */
@@ -613,8 +637,8 @@
         height: 56px;
         pointer-events: none;
         z-index: 99999;
-        filter: drop-shadow(0 26px 32px rgba(0, 0, 0, 0.65))
-          drop-shadow(0 0 26px rgba(168, 255, 224, 0.18));
+        filter: drop-shadow(0 16px 20px rgba(35, 20, 60, 0.2))
+          drop-shadow(0 0 22px rgba(166, 231, 255, 0.28));
         will-change: transform;
       }
 
@@ -624,8 +648,8 @@
         inset: 0;
         background: radial-gradient(
           1200px 800px at 50% 40%,
-          rgba(183, 166, 255, 0.1),
-          rgba(0, 0, 0, 0.62)
+          rgba(255, 179, 218, 0.35),
+          rgba(251, 247, 255, 0.8)
         );
         display: none;
         align-items: center;
@@ -635,12 +659,12 @@
       }
       .modal {
         width: min(720px, 94vw);
-        background: rgba(255, 255, 255, 0.085);
-        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.75);
+        border: 1px solid rgba(120, 90, 170, 0.18);
         border-radius: 24px;
         padding: 14px;
-        backdrop-filter: blur(14px);
-        box-shadow: 0 30px 100px rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 26px 80px rgba(35, 20, 60, 0.18);
         overflow: hidden;
       }
       .modalTop {
@@ -648,7 +672,7 @@
         justify-content: space-between;
         gap: 12px;
         padding: 8px 8px 12px 8px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        border-bottom: 1px solid rgba(120, 90, 170, 0.16);
       }
       .modalTop h2 {
         margin: 0;
@@ -657,48 +681,48 @@
       }
       .hint {
         margin-top: 6px;
-        color: rgba(255, 255, 255, 0.72);
+        color: rgba(32, 24, 55, 0.7);
         font-size: 12px;
         line-height: 1.3;
       }
       .closeBtn {
-        border: 1px solid rgba(255, 255, 255, 0.16);
-        background: rgba(0, 0, 0, 0.18);
+        border: 1px solid rgba(120, 90, 170, 0.18);
+        background: rgba(255, 255, 255, 0.65);
         color: var(--text);
         border-radius: 16px;
         padding: 10px 12px;
         font-size: 12px;
         cursor: pointer;
         user-select: none;
-        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.14);
+        box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.35);
       }
       .closeBtn:hover {
-        background: rgba(255, 255, 255, 0.07);
+        background: rgba(255, 255, 255, 0.78);
       }
 
       .stage {
         margin-top: 12px;
         padding: 14px;
         border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(120, 90, 170, 0.16);
         background:
           radial-gradient(
-            800px 380px at 50% 20%,
-            rgba(168, 255, 224, 0.09),
+            800px 380px at 30% 20%,
+            rgba(166, 231, 255, 0.28),
             transparent 60%
           ),
           radial-gradient(
-            800px 380px at 50% 90%,
-            rgba(255, 154, 213, 0.06),
+            800px 380px at 70% 90%,
+            rgba(255, 179, 218, 0.24),
             transparent 60%
           ),
-          rgba(0, 0, 0, 0.22);
+          rgba(255, 255, 255, 0.55);
         min-height: 340px;
         display: grid;
         place-items: center;
         overflow: hidden;
         position: relative;
-        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
+        box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.35);
       }
 
       /* spinner play */
@@ -714,7 +738,7 @@
         width: 260px;
         height: 260px;
         object-fit: contain;
-        filter: drop-shadow(0 22px 28px rgba(0, 0, 0, 0.55));
+        filter: drop-shadow(0 18px 22px rgba(35, 20, 60, 0.18));
       }
 
       /* stress ball play */
@@ -724,14 +748,14 @@
         border-radius: 999px;
         background: radial-gradient(
           circle at 30% 25%,
-          rgba(255, 255, 255, 0.92),
-          rgba(255, 154, 213, 0.78) 55%,
-          rgba(124, 72, 255, 0.2)
+          rgba(255, 255, 255, 0.96),
+          rgba(255, 179, 218, 0.75) 55%,
+          rgba(205, 184, 255, 0.35)
         );
         box-shadow:
-          0 28px 70px rgba(0, 0, 0, 0.65),
-          inset 0 0 26px rgba(255, 255, 255, 0.16);
-        border: 1px solid rgba(255, 255, 255, 0.16);
+          0 22px 60px rgba(35, 20, 60, 0.18),
+          inset 0 0 26px rgba(255, 255, 255, 0.25);
+        border: 1px solid rgba(120, 90, 170, 0.16);
         touch-action: none;
         transform: scale(1);
         transition: transform 0.12s ease;
@@ -743,7 +767,7 @@
         position: absolute;
         inset: 20%;
         border-radius: 999px;
-        background: rgba(0, 0, 0, 0.1);
+        background: rgba(35, 20, 60, 0.06);
         filter: blur(1px);
         transform: rotate(-12deg);
         opacity: 0.68;
@@ -757,13 +781,13 @@
         width: min(560px, 92%);
         height: 76px;
         border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(120, 90, 170, 0.16);
         background: linear-gradient(
           180deg,
-          rgba(255, 255, 255, 0.08),
-          rgba(0, 0, 0, 0.16)
+          rgba(255, 255, 255, 0.75),
+          rgba(255, 255, 255, 0.45)
         );
-        box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.35);
+        box-shadow: inset 0 0 24px rgba(255, 255, 255, 0.35);
         position: relative;
         touch-action: none;
       }
@@ -773,15 +797,15 @@
         border-radius: 999px;
         background: radial-gradient(
           circle at 30% 25%,
-          rgba(255, 255, 255, 0.95),
-          rgba(46, 230, 255, 0.95)
+          rgba(255, 255, 255, 0.96),
+          rgba(126, 231, 255, 0.95)
         );
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(120, 90, 170, 0.14);
         position: absolute;
         top: 50%;
         left: 10%;
         transform: translate(-50%, -50%);
-        box-shadow: 0 22px 44px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 18px 36px rgba(35, 20, 60, 0.16);
         cursor: grab;
         touch-action: none;
       }
@@ -794,23 +818,23 @@
         width: min(560px, 92%);
         aspect-ratio: 1/1;
         border-radius: 26px;
-        border: 1px solid rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(120, 90, 170, 0.16);
         background:
           radial-gradient(
             900px 700px at 30% 30%,
-            rgba(255, 154, 213, 0.22),
+            rgba(255, 179, 218, 0.35),
             transparent 55%
           ),
           radial-gradient(
             900px 700px at 80% 70%,
-            rgba(255, 210, 154, 0.22),
+            rgba(255, 241, 166, 0.32),
             transparent 55%
           ),
-          rgba(0, 0, 0, 0.12);
+          rgba(255, 255, 255, 0.55);
         display: grid;
         place-items: center;
         padding: 18px;
-        box-shadow: inset 0 0 36px rgba(0, 0, 0, 0.28);
+        box-shadow: inset 0 0 36px rgba(255, 255, 255, 0.35);
       }
       .bubbles {
         width: 100%;
@@ -821,15 +845,15 @@
       .bubble {
         aspect-ratio: 1/1;
         border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(120, 90, 170, 0.16);
         background: radial-gradient(
           circle at 30% 25%,
-          rgba(255, 255, 255, 0.14),
-          rgba(0, 0, 0, 0.2)
+          rgba(255, 255, 255, 0.6),
+          rgba(255, 255, 255, 0.3)
         );
         box-shadow:
-          inset 0 0 18px rgba(0, 0, 0, 0.4),
-          0 12px 22px rgba(0, 0, 0, 0.28);
+          inset 0 0 18px rgba(255, 255, 255, 0.35),
+          0 12px 22px rgba(35, 20, 60, 0.12);
         cursor: pointer;
         transition:
           transform 0.09s ease,
@@ -842,12 +866,12 @@
       .bubble.popped {
         background: radial-gradient(
           circle at 30% 25%,
-          rgba(255, 255, 255, 0.24),
-          rgba(0, 0, 0, 0.12)
+          rgba(255, 255, 255, 0.8),
+          rgba(255, 255, 255, 0.45)
         );
         box-shadow:
-          inset 0 0 12px rgba(255, 255, 255, 0.1),
-          0 10px 18px rgba(0, 0, 0, 0.22);
+          inset 0 0 12px rgba(255, 255, 255, 0.35),
+          0 10px 18px rgba(35, 20, 60, 0.1);
         transform: translateY(4px);
       }
     </style>
@@ -931,34 +955,37 @@
         const svgToDataUri = (svg) =>
           "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg.trim());
 
-        // ---------- ROOM BACKGROUND (same as previous premium bg) ----------
+        // ---------- ROOM BACKGROUND (PASTEL RAINBOW VERSION) ----------
         const BG_SVG = `
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
     <defs>
+      <!-- soft pastel wall + floor -->
       <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#2e2a5b"/>
-        <stop offset="0.55" stop-color="#171a34"/>
-        <stop offset="1" stop-color="#0c0d18"/>
+        <stop offset="0" stop-color="#fff6fb"/>
+        <stop offset="0.45" stop-color="#f6f2ff"/>
+        <stop offset="1" stop-color="#eef7ff"/>
       </linearGradient>
 
       <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#0b0c16"/>
-        <stop offset="1" stop-color="#070812"/>
+        <stop offset="0" stop-color="#fffdf2"/>
+        <stop offset="1" stop-color="#f6f7ff"/>
       </linearGradient>
 
-      <radialGradient id="windowGlow" cx="20%" cy="22%" r="65%">
-        <stop offset="0" stop-color="#a8ffe0" stop-opacity="0.25"/>
-        <stop offset="0.55" stop-color="#b7a6ff" stop-opacity="0.12"/>
-        <stop offset="1" stop-color="#000" stop-opacity="0"/>
+      <!-- gentle rainbow glows -->
+      <radialGradient id="windowGlow" cx="18%" cy="22%" r="70%">
+        <stop offset="0" stop-color="#a6e7ff" stop-opacity="0.55"/>
+        <stop offset="0.55" stop-color="#ffb3da" stop-opacity="0.28"/>
+        <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
       </radialGradient>
 
-      <radialGradient id="lampGlow" cx="78%" cy="18%" r="70%">
-        <stop offset="0" stop-color="#a8ffe0" stop-opacity="0.22"/>
-        <stop offset="1" stop-color="#000" stop-opacity="0"/>
+      <radialGradient id="lampGlow" cx="78%" cy="18%" r="75%">
+        <stop offset="0" stop-color="#b9ffd9" stop-opacity="0.40"/>
+        <stop offset="0.65" stop-color="#fff1a6" stop-opacity="0.22"/>
+        <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
       </radialGradient>
 
       <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
-        <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000" flood-opacity="0.55"/>
+        <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#23143c" flood-opacity="0.16"/>
       </filter>
 
       <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
@@ -966,98 +993,110 @@
       </filter>
 
       <pattern id="grain" width="120" height="120" patternUnits="userSpaceOnUse">
-        <circle cx="12" cy="18" r="1.2" fill="rgba(255,255,255,0.06)"/>
-        <circle cx="44" cy="30" r="1.1" fill="rgba(255,255,255,0.05)"/>
-        <circle cx="78" cy="20" r="1.0" fill="rgba(255,255,255,0.04)"/>
-        <circle cx="26" cy="66" r="1.0" fill="rgba(255,255,255,0.04)"/>
-        <circle cx="96" cy="74" r="1.2" fill="rgba(255,255,255,0.05)"/>
-        <circle cx="58" cy="92" r="1.0" fill="rgba(255,255,255,0.04)"/>
+        <circle cx="12" cy="18" r="1.2" fill="rgba(35,20,60,0.06)"/>
+        <circle cx="44" cy="30" r="1.1" fill="rgba(35,20,60,0.05)"/>
+        <circle cx="78" cy="20" r="1.0" fill="rgba(35,20,60,0.04)"/>
+        <circle cx="26" cy="66" r="1.0" fill="rgba(35,20,60,0.04)"/>
+        <circle cx="96" cy="74" r="1.2" fill="rgba(35,20,60,0.05)"/>
+        <circle cx="58" cy="92" r="1.0" fill="rgba(35,20,60,0.04)"/>
       </pattern>
 
       <linearGradient id="deskTop" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#0e1021"/>
-        <stop offset="1" stop-color="#090a14"/>
+        <stop offset="0" stop-color="rgba(255,255,255,0.92)"/>
+        <stop offset="1" stop-color="rgba(246,247,255,0.92)"/>
       </linearGradient>
 
       <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="rgba(255,255,255,0.20)"/>
-        <stop offset="1" stop-color="rgba(255,255,255,0.05)"/>
+        <stop offset="0" stop-color="rgba(255,255,255,0.75)"/>
+        <stop offset="1" stop-color="rgba(255,255,255,0.35)"/>
       </linearGradient>
 
       <linearGradient id="neon" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stop-color="#b7a6ff"/>
-        <stop offset="0.5" stop-color="#a8ffe0"/>
-        <stop offset="1" stop-color="#ff9ad5"/>
+        <stop offset="0" stop-color="#ffb3da"/>
+        <stop offset="0.33" stop-color="#fff1a6"/>
+        <stop offset="0.66" stop-color="#b9ffd9"/>
+        <stop offset="1" stop-color="#a6e7ff"/>
       </linearGradient>
     </defs>
 
+    <!-- base -->
     <rect width="1600" height="740" fill="url(#wall)"/>
     <rect y="740" width="1600" height="260" fill="url(#floor)"/>
+
+    <!-- glows + grain -->
     <rect width="1600" height="740" fill="url(#windowGlow)"/>
     <rect width="1600" height="740" fill="url(#lampGlow)"/>
-    <rect width="1600" height="740" fill="url(#grain)" opacity="0.55" filter="url(#soft)"/>
+    <rect width="1600" height="1000" fill="url(#grain)" opacity="0.55" filter="url(#soft)"/>
 
-    <g opacity="0.8" filter="url(#shadow)">
+    <!-- top neon line -->
+    <g opacity="0.85" filter="url(#shadow)">
       <rect x="120" y="90" width="1360" height="10" rx="5" fill="url(#neon)" opacity="0.55"/>
       <rect x="120" y="90" width="1360" height="10" rx="5" fill="url(#neon)" opacity="0.25" filter="url(#soft)"/>
     </g>
 
+    <!-- framed wall panels -->
     <g filter="url(#shadow)">
-      <rect x="110" y="150" width="500" height="320" rx="26" fill="#0a0b18" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
-      <path d="M110 310h500" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
-      <path d="M360 150v320" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
-      <circle cx="220" cy="250" r="84" fill="#a8ffe0" opacity="0.10"/>
-      <circle cx="510" cy="280" r="110" fill="#b7a6ff" opacity="0.08"/>
+      <rect x="110" y="150" width="500" height="320" rx="26" fill="rgba(255,255,255,0.55)" stroke="rgba(120,90,170,0.22)" stroke-width="2"/>
+      <path d="M110 310h500" stroke="rgba(120,90,170,0.20)" stroke-width="2"/>
+      <path d="M360 150v320" stroke="rgba(120,90,170,0.20)" stroke-width="2"/>
+      <circle cx="220" cy="250" r="84" fill="#a6e7ff" opacity="0.25"/>
+      <circle cx="510" cy="280" r="110" fill="#cdb8ff" opacity="0.22"/>
     </g>
 
+    <!-- little shelf + frames -->
     <g filter="url(#shadow)">
-      <rect x="660" y="130" width="190" height="240" rx="22" fill="#0b0c18" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
-      <rect x="690" y="160" width="130" height="160" rx="18" fill="url(#neon)" opacity="0.20"/>
-      <path d="M705 308c30-42 66-58 100-60" stroke="rgba(255,255,255,0.25)" stroke-width="4" stroke-linecap="round"/>
-      <circle cx="752" cy="232" r="20" fill="#ff9ad5" opacity="0.18"/>
+      <rect x="660" y="130" width="190" height="240" rx="22" fill="rgba(255,255,255,0.55)" stroke="rgba(120,90,170,0.20)" stroke-width="2"/>
+      <rect x="690" y="160" width="130" height="160" rx="18" fill="url(#neon)" opacity="0.18"/>
+      <path d="M705 308c30-42 66-58 100-60" stroke="rgba(120,90,170,0.22)" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="752" cy="232" r="20" fill="#ffb3da" opacity="0.22"/>
 
-      <rect x="880" y="150" width="240" height="210" rx="22" fill="#0b0c18" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
-      <rect x="910" y="180" width="180" height="140" rx="18" fill="#a8ffe0" opacity="0.12"/>
-      <path d="M940 300h140" stroke="rgba(255,255,255,0.22)" stroke-width="5" stroke-linecap="round"/>
+      <rect x="880" y="150" width="240" height="210" rx="22" fill="rgba(255,255,255,0.55)" stroke="rgba(120,90,170,0.20)" stroke-width="2"/>
+      <rect x="910" y="180" width="180" height="140" rx="18" fill="#b9ffd9" opacity="0.22"/>
+      <path d="M940 300h140" stroke="rgba(120,90,170,0.22)" stroke-width="5" stroke-linecap="round"/>
     </g>
 
+    <!-- long shelf -->
     <g filter="url(#shadow)">
-      <rect x="720" y="420" width="780" height="28" rx="14" fill="#1a1b33" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
-      <rect x="750" y="360" width="120" height="55" rx="14" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
-      <rect x="890" y="350" width="90" height="70" rx="16" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
-      <rect x="1000" y="360" width="160" height="60" rx="16" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
-      <circle cx="1260" cy="386" r="28" fill="#ff9ad5" opacity="0.18"/>
-      <circle cx="1330" cy="388" r="22" fill="#a8ffe0" opacity="0.16"/>
-      <rect x="1370" y="360" width="90" height="58" rx="18" fill="url(#glass)" opacity="0.35" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+      <rect x="720" y="420" width="780" height="28" rx="14" fill="rgba(255,255,255,0.55)" stroke="rgba(120,90,170,0.16)" stroke-width="2"/>
+      <rect x="750" y="360" width="120" height="55" rx="14" fill="rgba(255,255,255,0.65)" stroke="rgba(120,90,170,0.16)" stroke-width="2"/>
+      <rect x="890" y="350" width="90" height="70" rx="16" fill="rgba(255,255,255,0.65)" stroke="rgba(120,90,170,0.16)" stroke-width="2"/>
+      <rect x="1000" y="360" width="160" height="60" rx="16" fill="rgba(255,255,255,0.65)" stroke="rgba(120,90,170,0.16)" stroke-width="2"/>
+      <circle cx="1260" cy="386" r="28" fill="#ffb3da" opacity="0.22"/>
+      <circle cx="1330" cy="388" r="22" fill="#a6e7ff" opacity="0.22"/>
+      <rect x="1370" y="360" width="90" height="58" rx="18" fill="url(#glass)" opacity="0.70" stroke="rgba(120,90,170,0.16)" stroke-width="2"/>
     </g>
 
+    <!-- desk -->
     <g filter="url(#shadow)">
       <path d="M160 720h1280v190a34 34 0 0 1-34 34H194a34 34 0 0 1-34-34V720z"
-        fill="url(#deskTop)" stroke="rgba(255,255,255,0.11)" stroke-width="2"/>
-      <rect x="230" y="785" width="360" height="135" rx="20" fill="#070812" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
-      <rect x="630" y="785" width="360" height="135" rx="20" fill="#070812" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
-      <rect x="1030" y="785" width="340" height="135" rx="20" fill="#070812" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
-      <rect x="560" y="705" width="480" height="70" rx="20" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
-      <g opacity="0.55">
+        fill="url(#deskTop)" stroke="rgba(120,90,170,0.20)" stroke-width="2"/>
+      <rect x="230" y="785" width="360" height="135" rx="20" fill="rgba(255,255,255,0.60)" stroke="rgba(120,90,170,0.16)" stroke-width="2"/>
+      <rect x="630" y="785" width="360" height="135" rx="20" fill="rgba(255,255,255,0.60)" stroke="rgba(120,90,170,0.16)" stroke-width="2"/>
+      <rect x="1030" y="785" width="340" height="135" rx="20" fill="rgba(255,255,255,0.60)" stroke="rgba(120,90,170,0.16)" stroke-width="2"/>
+      <rect x="560" y="705" width="480" height="70" rx="20" fill="rgba(255,255,255,0.70)" stroke="rgba(120,90,170,0.18)" stroke-width="2"/>
+      <g opacity="0.70">
         ${Array.from({ length: 14 })
           .map(
             (_, i) =>
-              `<rect x="${585 + i * 32}" y="724" width="24" height="18" rx="6" fill="rgba(255,255,255,0.10)"/>`,
+              `<rect x="${585 + i * 32}" y="724" width="24" height="18" rx="6" fill="rgba(120,90,170,0.10)"/>`,
           )
           .join("")}
       </g>
     </g>
 
+    <!-- plant -->
     <g filter="url(#shadow)">
-      <rect x="1285" y="560" width="170" height="220" rx="30" fill="#0b0c18" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
-      <path d="M1370 560c-16-70 18-160 86-198 22 46 14 134-38 198" fill="#a8ffe0" opacity="0.22"/>
-      <path d="M1370 560c-48-58-84-134-58-206 58 22 108 124 96 206" fill="#a8ffe0" opacity="0.18"/>
-      <path d="M1370 560c-38-46-106-102-174-96 22 62 96 132 174 96" fill="#b7a6ff" opacity="0.12"/>
+      <rect x="1285" y="560" width="170" height="220" rx="30" fill="rgba(255,255,255,0.60)" stroke="rgba(120,90,170,0.16)" stroke-width="2"/>
+      <path d="M1370 560c-16-70 18-160 86-198 22 46 14 134-38 198" fill="#b9ffd9" opacity="0.55"/>
+      <path d="M1370 560c-48-58-84-134-58-206 58 22 108 124 96 206" fill="#b9ffd9" opacity="0.45"/>
+      <path d="M1370 560c-38-46-106-102-174-96 22 62 96 132 174 96" fill="#cdb8ff" opacity="0.28"/>
     </g>
 
-    <g opacity="0.9">
-      <ellipse cx="780" cy="925" rx="600" ry="120" fill="#a8ffe0" opacity="0.06"/>
-      <ellipse cx="780" cy="925" rx="460" ry="92" fill="#ff9ad5" opacity="0.05"/>
+    <!-- soft rug glow -->
+    <g opacity="0.95">
+      <ellipse cx="780" cy="925" rx="600" ry="120" fill="#a6e7ff" opacity="0.20"/>
+      <ellipse cx="780" cy="925" rx="460" ry="92" fill="#ffb3da" opacity="0.16"/>
+      <ellipse cx="780" cy="925" rx="340" ry="70" fill="#fff1a6" opacity="0.12"/>
     </g>
   </svg>`;
 
@@ -1087,24 +1126,24 @@
     `;
         };
 
-        // ---------- FIDGET SPRITES (now with glitter stars inside) ----------
+        // ---------- FIDGET SPRITES (kept cute + colorful) ----------
         const FIDGET_SVGS = {
           "Pop-it": () => `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
         <defs>
           <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#ff8fcf"/>
-            <stop offset="0.55" stop-color="#ffd38f"/>
-            <stop offset="1" stop-color="#a8ffe0"/>
+            <stop offset="0" stop-color="#ffb3da"/>
+            <stop offset="0.55" stop-color="#fff1a6"/>
+            <stop offset="1" stop-color="#b9ffd9"/>
           </linearGradient>
           <radialGradient id="shine" cx="25%" cy="18%" r="60%">
-            <stop offset="0" stop-color="rgba(255,255,255,0.55)"/>
+            <stop offset="0" stop-color="rgba(255,255,255,0.65)"/>
             <stop offset="1" stop-color="rgba(255,255,255,0)"/>
           </radialGradient>
         </defs>
         <rect x="14" y="14" width="100" height="100" rx="22" fill="url(#body)"/>
-        <rect x="16" y="16" width="96" height="96" rx="20" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="3"/>
-        <rect x="18" y="18" width="92" height="92" rx="18" fill="url(#shine)" opacity="0.45"/>
+        <rect x="16" y="16" width="96" height="96" rx="20" fill="none" stroke="rgba(120,90,170,.22)" stroke-width="3"/>
+        <rect x="18" y="18" width="92" height="92" rx="18" fill="url(#shine)" opacity="0.55"/>
         ${glitterStars(0)}
         ${[0, 1, 2]
           .map((r) =>
@@ -1113,9 +1152,9 @@
                 const cx = 41 + c * 23,
                   cy = 41 + r * 23;
                 return `
-            <circle cx="${cx}" cy="${cy}" r="9.2" fill="rgba(0,0,0,.16)"/>
-            <circle cx="${cx - 1}" cy="${cy - 1}" r="9.2" fill="rgba(255,255,255,.16)"/>
-            <circle cx="${cx + 1}" cy="${cy + 1}" r="7.8" fill="rgba(0,0,0,.08)"/>
+            <circle cx="${cx}" cy="${cy}" r="9.2" fill="rgba(35,20,60,.10)"/>
+            <circle cx="${cx - 1}" cy="${cy - 1}" r="9.2" fill="rgba(255,255,255,.45)"/>
+            <circle cx="${cx + 1}" cy="${cy + 1}" r="7.8" fill="rgba(35,20,60,.06)"/>
           `;
               })
               .join(""),
@@ -1128,56 +1167,56 @@
         <defs>
           <radialGradient id="rg" cx="30%" cy="25%">
             <stop offset="0" stop-color="#ffffff"/>
-            <stop offset="0.45" stop-color="#a8ffe0"/>
-            <stop offset="1" stop-color="#4a5cff"/>
+            <stop offset="0.45" stop-color="#a6e7ff"/>
+            <stop offset="1" stop-color="#cdb8ff"/>
           </radialGradient>
           <radialGradient id="metal" cx="35%" cy="30%">
             <stop offset="0" stop-color="#ffffff"/>
-            <stop offset="1" stop-color="#7a86ff"/>
+            <stop offset="1" stop-color="#c7a6ff"/>
           </radialGradient>
         </defs>
         <path d="M64 18c11 0 20 9 20 20 0 6-3 11-6 15l11 20c3-1 6-2 10-2 11 0 20 9 20 20s-9 20-20 20c-8 0-14-4-18-11H47c-4 7-10 11-18 11-11 0-20-9-20-20s9-20 20-20c4 0 7 1 10 2l11-20c-3-4-6-9-6-15 0-11 9-20 20-20z"
-          fill="url(#rg)" stroke="rgba(255,255,255,.22)" stroke-width="3"/>
+          fill="url(#rg)" stroke="rgba(120,90,170,.20)" stroke-width="3"/>
         ${glitterStars(1)}
-        <circle cx="64" cy="64" r="16" fill="rgba(0,0,0,.20)"/>
+        <circle cx="64" cy="64" r="16" fill="rgba(35,20,60,.10)"/>
         <circle cx="64" cy="64" r="12" fill="url(#metal)" opacity="0.92"/>
-        <circle cx="64" cy="64" r="6" fill="rgba(0,0,0,.12)"/>
+        <circle cx="64" cy="64" r="6" fill="rgba(35,20,60,.06)"/>
       </svg>`,
 
           "Infinity Cube": () => `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
         <defs>
           <linearGradient id="b" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#74d6ff"/>
-            <stop offset="1" stop-color="#b7a6ff"/>
+            <stop offset="0" stop-color="#a6e7ff"/>
+            <stop offset="1" stop-color="#cdb8ff"/>
           </linearGradient>
           <radialGradient id="h" cx="25%" cy="20%" r="70%">
-            <stop offset="0" stop-color="rgba(255,255,255,0.55)"/>
+            <stop offset="0" stop-color="rgba(255,255,255,0.65)"/>
             <stop offset="1" stop-color="rgba(255,255,255,0)"/>
           </radialGradient>
         </defs>
-        <rect x="18" y="26" width="50" height="50" rx="12" fill="url(#b)" stroke="rgba(255,255,255,.22)" stroke-width="3"/>
-        <rect x="62" y="54" width="50" height="50" rx="12" fill="url(#b)" opacity="0.95" stroke="rgba(255,255,255,.22)" stroke-width="3"/>
-        <rect x="20" y="28" width="46" height="46" rx="11" fill="url(#h)" opacity="0.35"/>
-        <rect x="64" y="56" width="46" height="46" rx="11" fill="url(#h)" opacity="0.28"/>
+        <rect x="18" y="26" width="50" height="50" rx="12" fill="url(#b)" stroke="rgba(120,90,170,.20)" stroke-width="3"/>
+        <rect x="62" y="54" width="50" height="50" rx="12" fill="url(#b)" opacity="0.95" stroke="rgba(120,90,170,.20)" stroke-width="3"/>
+        <rect x="20" y="28" width="46" height="46" rx="11" fill="url(#h)" opacity="0.40"/>
+        <rect x="64" y="56" width="46" height="46" rx="11" fill="url(#h)" opacity="0.32"/>
         ${glitterStars(2)}
-        <path d="M64 50c-10 0-18-8-18-18" stroke="rgba(255,255,255,.28)" stroke-width="7" stroke-linecap="round"/>
-        <path d="M64 78c10 0 18 8 18 18" stroke="rgba(255,255,255,.28)" stroke-width="7" stroke-linecap="round"/>
+        <path d="M64 50c-10 0-18-8-18-18" stroke="rgba(120,90,170,.20)" stroke-width="7" stroke-linecap="round"/>
+        <path d="M64 78c10 0 18 8 18 18" stroke="rgba(120,90,170,.20)" stroke-width="7" stroke-linecap="round"/>
       </svg>`,
 
           Tangle: () => `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
         <defs>
           <linearGradient id="t" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#a8ffe0"/>
+            <stop offset="0" stop-color="#b9ffd9"/>
             <stop offset="0.55" stop-color="#ffffff"/>
-            <stop offset="1" stop-color="#ff9ad5"/>
+            <stop offset="1" stop-color="#ffb3da"/>
           </linearGradient>
         </defs>
         <path d="M28 74c0-24 20-44 44-44s44 20 44 44-20 44-44 44c-11 0-22-4-30-11"
           fill="none" stroke="url(#t)" stroke-width="18" stroke-linecap="round"/>
         ${glitterStars(3)}
-        <circle cx="40" cy="90" r="11" fill="#b7a6ff" opacity="0.45"/>
+        <circle cx="40" cy="90" r="11" fill="#cdb8ff" opacity="0.45"/>
       </svg>`,
 
           "Stress Ball": () => `
@@ -1185,41 +1224,41 @@
         <defs>
           <radialGradient id="s" cx="30%" cy="25%">
             <stop offset="0" stop-color="#ffffff"/>
-            <stop offset="0.50" stop-color="#ff9ad5"/>
-            <stop offset="1" stop-color="#4a5cff"/>
+            <stop offset="0.50" stop-color="#ffb3da"/>
+            <stop offset="1" stop-color="#cdb8ff"/>
           </radialGradient>
         </defs>
-        <circle cx="64" cy="68" r="40" fill="url(#s)" stroke="rgba(255,255,255,.22)" stroke-width="3"/>
+        <circle cx="64" cy="68" r="40" fill="url(#s)" stroke="rgba(120,90,170,.18)" stroke-width="3"/>
         ${glitterStars(4)}
-        <path d="M40 86c11 10 37 10 48 0" stroke="rgba(0,0,0,.13)" stroke-width="7" stroke-linecap="round"/>
-        <circle cx="48" cy="52" r="10" fill="rgba(255,255,255,.22)" opacity="0.65"/>
+        <path d="M40 86c11 10 37 10 48 0" stroke="rgba(35,20,60,.10)" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="48" cy="52" r="10" fill="rgba(255,255,255,.28)" opacity="0.75"/>
       </svg>`,
 
           "Marble Mesh": () => `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
         <defs>
           <linearGradient id="mesh" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="rgba(255,255,255,0.16)"/>
-            <stop offset="1" stop-color="rgba(255,255,255,0.06)"/>
+            <stop offset="0" stop-color="rgba(255,255,255,0.72)"/>
+            <stop offset="1" stop-color="rgba(255,255,255,0.40)"/>
           </linearGradient>
           <radialGradient id="m" cx="30%" cy="25%">
             <stop offset="0" stop-color="#ffffff"/>
-            <stop offset="1" stop-color="#2fe6ff"/>
+            <stop offset="1" stop-color="#7ee7ff"/>
           </radialGradient>
         </defs>
-        <rect x="14" y="42" width="100" height="44" rx="22" fill="url(#mesh)" stroke="rgba(255,255,255,.20)" stroke-width="3"/>
+        <rect x="14" y="42" width="100" height="44" rx="22" fill="url(#mesh)" stroke="rgba(120,90,170,.18)" stroke-width="3"/>
         ${glitterStars(5)}
-        <circle cx="64" cy="64" r="19" fill="url(#m)" stroke="rgba(0,0,0,.12)" stroke-width="3"/>
-        <path d="M24 64h80" stroke="rgba(255,255,255,.20)" stroke-width="7" stroke-linecap="round" opacity="0.85"/>
+        <circle cx="64" cy="64" r="19" fill="url(#m)" stroke="rgba(35,20,60,.08)" stroke-width="3"/>
+        <path d="M24 64h80" stroke="rgba(120,90,170,.14)" stroke-width="7" stroke-linecap="round" opacity="0.85"/>
       </svg>`,
 
           "Mini Slinky": () => `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
         <defs>
           <linearGradient id="sl" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stop-color="#ff9ad5"/>
-            <stop offset="0.5" stop-color="#b7a6ff"/>
-            <stop offset="1" stop-color="#a8ffe0"/>
+            <stop offset="0" stop-color="#ffb3da"/>
+            <stop offset="0.5" stop-color="#cdb8ff"/>
+            <stop offset="1" stop-color="#b9ffd9"/>
           </linearGradient>
         </defs>
         ${glitterStars(6)}
@@ -1423,7 +1462,6 @@
             el.className = "item";
             el.dataset.id = it.id;
 
-            // use vars (smoother + easier drag)
             el.style.setProperty("--x", it.x + "%");
             el.style.setProperty("--y", it.y + "%");
             el.style.setProperty("--size", it.size + "px");
@@ -1805,7 +1843,7 @@
           img.alt = "Slinky";
           img.style.width = "460px";
           img.style.maxWidth = "92%";
-          img.style.filter = "drop-shadow(0 22px 28px rgba(0,0,0,.55))";
+          img.style.filter = "drop-shadow(0 18px 22px rgba(35,20,60,.18))";
           img.style.transformOrigin = "50% 50%";
           img.style.touchAction = "none";
           stage.appendChild(img);
@@ -1843,7 +1881,7 @@
           img.alt = it.name;
           img.style.width = "280px";
           img.style.maxWidth = "92%";
-          img.style.filter = "drop-shadow(0 22px 28px rgba(0,0,0,.55))";
+          img.style.filter = "drop-shadow(0 18px 22px rgba(35,20,60,.18))";
           img.style.transformOrigin = "50% 50%";
           img.style.touchAction = "none";
           stage.appendChild(img);
